@@ -5,14 +5,14 @@
     },
     {
         "name":"P2P",
-        "route":"p2p"
+        "route":"/p2p"
     },
     {
         "name":"Explore",
-        "route":"explore"
+        "route":"/explore"
     },
     {
         "name":"Pool",
-        "route":"pool"
+        "route":"/pool"
     }
 ]
