@@ -10,6 +10,8 @@ import EarnGold from './earn-gold.svg'
 import Instagram from './instagram.svg'
 import Telegram from './telegram.svg'
 import X from './x.svg'
+import Plus from './plus.svg'
+import Folder from './folder.svg'
 
 export {
     Logo,
@@ -23,6 +25,7 @@ export {
     EarnGold,
     Instagram,
     Telegram,
-    X
-
+    X,
+    Plus,
+    Folder,
 }
