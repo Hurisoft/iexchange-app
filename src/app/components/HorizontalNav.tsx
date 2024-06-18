@@ -1,11 +1,19 @@
 'use client';
 
-import React from 'react';
+// next
 import Image from 'next/image';
-import routeData from '../data/routes.json';
-import { Logo } from '@/assets/index';
+// import
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+
+// components
 import Button from './Button';
 import NavLink from './NavLink';
+
+// assets
+import { Logo } from '@/assets/index';
+
+// data
+import routeData from '../data/routes.json';
 
 const HorizontalNav = () => {
   return (
@@ -21,7 +29,8 @@ const HorizontalNav = () => {
           <NavLink key={i} href={item.route}>{item.name}</NavLink>
         ))}
       </div>
-      <Button text="Connect Wallet" />
+      {/* <Button text="Connect Wallet" /> */}
+      <ConnectButton />
     </div>
   );
 }

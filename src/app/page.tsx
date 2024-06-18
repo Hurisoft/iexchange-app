@@ -2,7 +2,7 @@
 
 import { GoldCoins, Logo } from '@/assets/index';
 import React from 'react';
-import Dex from './components/Dex';
+import Dex from './components/dex';
 import HorizontalNav from './components/HorizontalNav';
 import Image from 'next/image';
 import Faq from './components/Faq';
