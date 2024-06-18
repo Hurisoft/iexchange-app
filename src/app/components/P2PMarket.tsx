@@ -6,6 +6,13 @@ import supportedTokens from '../data/tokens.json'
 import SelectInput from './SelectInput';
 import { Menu } from '@/assets/index';
 import Image from 'next/image'
+import { CombinedInputSelect } from './index';
+
+const options = [
+    { label: 'Option 1', value: 'option1' },
+    { label: 'Option 2', value: 'option2' },
+    { label: 'Option 3', value: 'option3' },
+  ];
 
 const P2PMarket = ({ styles }: { styles?: any }) => {
     const [activeTab, setActiveTab] = useState('sell');
@@ -65,14 +72,12 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
                 </div>
             </div>
             <div className='w-full flex flex-row justify-between items-center mb-4'>
-                <div></div>
+                <div>
+                    <CombinedInputSelect placeholder='Enter Amount' options={options} icon={undefined} inputValue={''} onInputChange={() => { }} onSelectChange={() => { }} />
+                </div>
                 <div className='flex flex-row justify-start items-center space-x-3'>
-                    <SelectInput options={[]} value={''} onChange={function (event: React.ChangeEvent<HTMLSelectElement>): void {
-                        throw new Error('Function not implemented.');
-                    }} />
-                    <SelectInput options={[]} value={''} onChange={function (event: React.ChangeEvent<HTMLSelectElement>): void {
-                        throw new Error('Function not implemented.');
-                    }} />
+                    <SelectInput options={[]} value={''} onChange={()=>{}} />
+                    <SelectInput options={[]} value={''} onChange={()=>{}} />
                     <button className='h-full rounded-md border border-[#C3D5F173] shadow-sm px-4 py-4 bg-transparent mt-2'>
                         <Image
                             src={Menu}
