@@ -34,7 +34,7 @@ const Page: React.FC = () => {
         <div className="mx-20">
           <div className='pt-20'>
             <div className='w-full'>
-              <P2PMarket />
+              <P2PMarket styles={{color:"white"}} />
             </div>
             <Earn />
             <div className='mt-10'>

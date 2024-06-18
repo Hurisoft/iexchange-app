@@ -14,7 +14,7 @@ const NavLink: FC<Props> = ({ href, children }) => {
     const isActive = pathname === href;
 
     return (
-        <Link href={href} className={`px-8 py-2 rounded-md text-sm font-medium ${isActive ? 'text-white' : 'text-gray-700'}`}>
+        <Link href={href} className={`px-4 py-2 rounded-md text-sm font-medium ${isActive ? 'text-white' : 'text-gray-700'}`}>
             {children}
         </Link>
     );

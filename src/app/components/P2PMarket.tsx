@@ -7,7 +7,7 @@ import SelectInput from './SelectInput';
 import { Menu } from '@/assets/index';
 import Image from 'next/image'
 
-const P2PMarket = () => {
+const P2PMarket = ({ styles }: { styles?: any }) => {
     const [activeTab, setActiveTab] = useState('sell');
     const [activeToken, setActiveToken] = useState('USDT');
     const data: never[] = []
@@ -18,32 +18,32 @@ const P2PMarket = () => {
 
     const columns = [
         {
-          name: 'ID',
-          selector: (row: { id: any; }) => row.id,
-          sortable: true,
+            name: 'ID',
+            selector: (row: { id: any; }) => row.id,
+            sortable: true,
         },
         {
-          name: 'Platform',
-          selector: (row: { platform: any; }) => row.platform,
-          sortable: true,
-          cell: (row: { icon: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; platform: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }) => <div className="flex items-center"><span className="mr-2">{row.icon}</span>{row.platform}</div>,
+            name: 'Platform',
+            selector: (row: { platform: any; }) => row.platform,
+            sortable: true,
+            cell: (row: { icon: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; platform: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }) => <div className="flex items-center"><span className="mr-2">{row.icon}</span>{row.platform}</div>,
         },
-      ];
+    ];
     return (
-        <div className='relative w-full h-auto bg-[#14161B] rounded-lg p-6 px-0 flex flex-col justify-center items-start'>
-            <h1 className='text-white py-8'>iExchange P2P Market</h1>
+        <div className='relative w-full h-auto bg-[#14161B] text-white rounded-lg p-6 px-0 flex flex-col justify-center items-start' style={styles}>
+            <h1 className=' py-8'>iExchange P2P Market</h1>
             <div className='w-full flex flex-row justify-between items-center mb-4'>
                 <div className='flex flex-row justify-center items-center'>
                     <div className='flex p-1 bg-[#1D2027] border border-[#C3D5F173] rounded-lg mr-4'>
                         <div
-                            className={`cursor-pointer px-6 py-1 rounded-tl-lg rounded-bl-lg ${activeTab === 'sell' ? 'bg-[#1D2027] text-white' : 'bg-[#2A2D34] text-gray-500'
+                            className={`cursor-pointer px-6 py-1 rounded-tl-lg rounded-bl-lg ${activeTab === 'sell' ? 'bg-[#1D2027] ' : 'bg-[#2A2D34] text-gray-500'
                                 }`}
                             onClick={() => handleTabClick('sell')}
                         >
                             Sell
                         </div>
                         <div
-                            className={`cursor-pointer px-6 py-1 rounded-tr-lg rounded-br-lg ${activeTab === 'buy' ? 'bg-[#1D2027] text-white' : 'bg-[#2A2D34] text-gray-500'
+                            className={`cursor-pointer px-6 py-1 rounded-tr-lg rounded-br-lg ${activeTab === 'buy' ? 'bg-[#1D2027] ' : 'bg-[#2A2D34] text-gray-500'
                                 }`}
                             onClick={() => handleTabClick('buy')}
                         >
@@ -54,7 +54,7 @@ const P2PMarket = () => {
                         supportedTokens.map((item, i) => (
                             <div
                                 key={i}
-                                className={`cursor-pointer px-4 py-1 rounded-tl-lg rounded-bl-lg text-sm ${activeToken === item.name ? ' text-[#FFB323]' : ' text-white'
+                                className={`cursor-pointer px-4 py-1 rounded-tl-lg rounded-bl-lg text-sm ${activeToken === item.name ? ' text-[#FFB323]' : ' '
                                     }`}
                                 onClick={() => setActiveToken(item.name)}
                             >
@@ -63,7 +63,13 @@ const P2PMarket = () => {
                         ))
                     }
                 </div>
+            </div>
+            <div className='w-full flex flex-row justify-between items-center mb-4'>
+                <div></div>
                 <div className='flex flex-row justify-start items-center space-x-3'>
+                    <SelectInput options={[]} value={''} onChange={function (event: React.ChangeEvent<HTMLSelectElement>): void {
+                        throw new Error('Function not implemented.');
+                    }} />
                     <SelectInput options={[]} value={''} onChange={function (event: React.ChangeEvent<HTMLSelectElement>): void {
                         throw new Error('Function not implemented.');
                     }} />

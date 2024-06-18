@@ -1,9 +1,9 @@
 import { Logo } from '@/assets/index';
 import Image from 'next/image'
 
-const Footer: React.FC = () => {
+const Footer = ({styles}:{styles?:any}) => {
   return (
-    <footer className="bg-[#202229] text-white py-6 pb-0 w-full">
+    <footer className="bg-[#202229] text-white py-6 pb-0 w-full" style={styles}>
       <div className='container mx-auto'>
         <div className=" px-0">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-8">

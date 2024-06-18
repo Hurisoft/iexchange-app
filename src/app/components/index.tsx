@@ -12,6 +12,7 @@ import SelectInput from "./SelectInput";
 import Faq from "./Faq";
 import Earn from './Earn'
 import IExchangeBanner from "./IExchangeBanner";
+import MenuItem from "./MenuItem";
 
 export {
     HorizontalNav,
@@ -25,5 +26,6 @@ export {
     SelectInput,
     Faq,
     Earn,
-    IExchangeBanner
+    IExchangeBanner,
+    MenuItem
 }
