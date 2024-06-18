@@ -12,6 +12,7 @@ import Telegram from './telegram.svg'
 import X from './x.svg'
 import Plus from './plus.svg'
 import Folder from './folder.svg'
+import ToDo from './todo.svg'
 
 export {
     Logo,
@@ -28,4 +29,5 @@ export {
     X,
     Plus,
     Folder,
+    ToDo
 }
