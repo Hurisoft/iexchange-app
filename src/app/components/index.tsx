@@ -11,6 +11,7 @@ import P2PMarket from "./P2PMarket";
 import SelectInput from "./SelectInput";
 import Faq from "./Faq";
 import Earn from './Earn'
+import IExchangeBanner from "./IExchangeBanner";
 
 export {
     HorizontalNav,
@@ -23,5 +24,6 @@ export {
     P2PMarket,
     SelectInput,
     Faq,
-    Earn
+    Earn,
+    IExchangeBanner
 }
