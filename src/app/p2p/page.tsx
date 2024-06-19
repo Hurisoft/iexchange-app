@@ -7,7 +7,10 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 // p2p area components
+import StakedSuccessModal from "./p2p-area/staked-success-modal";
+import MerchantStakeModal from "./p2p-area/merchant-stake-modal";
 import BecomeMerchantModal from "./p2p-area/become-merchant-modal";
+import VerifyIdentityModal from "./p2p-area/verify-your-identity-modal";
 // components
 import {
   Button,
@@ -40,15 +43,21 @@ const P2PPage = () => {
   ]);
   const [activeSubMenu, setActiveSubMenu] = useState("iExchange P2P Market");
   const [activeTab, setActiveTab] = useState("trade");
+  const [merchantKycOpen, setMerchantKycOpen] = useState(false);
+  const [stakedSuccessOpen, setStakedSuccessOpen] = useState(false);
+  const [merchantStakeOpen, setMerchantStakeOpen] = useState(false);
   const [becomeMerchantOpen, setBecomeMerchantOpen] = useState(false);
 
   // handlers
   const handleOpenBecomeMerchantModal = () => {
-    setBecomeMerchantOpen(true);
-    console.log("hh")
+    // setBecomeMerchantOpen(true);
+    setMerchantKycOpen(true);
   };
 
-  console.log({becomeMerchantOpen})
+  const handleBecomeMerchantProceed = () => {
+    // TODO: do some thing with the data
+    setMerchantStakeOpen(true);
+  }
 
   return (
     <>
@@ -57,7 +66,7 @@ const P2PPage = () => {
           <div className="w-full p-6 flex flex-row justify-between items-center">
             <div className="flex flex-row space-x-6">
               <div className="flex flex-row items-center text-2xl">
-                <span className="text-[#ffffff] font-light">Dex</span>
+                <span className="text-[#fffsetMerchantStakeOpenfff] font-light">Dex</span>
                 <span className="text-[#1ABCFE] font-bold">Ram</span>
               </div>
               <div className="flex flex-row">
@@ -197,6 +206,20 @@ const P2PPage = () => {
       <BecomeMerchantModal
         open={becomeMerchantOpen}
         setOpen={setBecomeMerchantOpen}
+        onProceed={handleBecomeMerchantProceed}
+      />
+      <MerchantStakeModal
+        open={merchantStakeOpen}
+        setOpen={setMerchantStakeOpen}
+        onStake={handleBecomeMerchantProceed}
+      />
+      <StakedSuccessModal
+        open={stakedSuccessOpen}
+        setOpen={setStakedSuccessOpen}
+      />
+      <VerifyIdentityModal
+        open={merchantKycOpen}
+        setOpen={setMerchantKycOpen}
       />
     </>
   );
