@@ -26,7 +26,7 @@ const columns = [
         )
     },
     {
-        name: "Gender",
+        name: "Genderk",
         selector: (row: any) => row.gender
     },
     {
