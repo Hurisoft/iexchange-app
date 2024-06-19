@@ -1,84 +1,10 @@
 "use client";
 import { useState } from "react";
-import styles from "./page.module.css";
-import TransgateConnect from "@zkpass/transgate-js-sdk";
-import styled from "styled-components";
 import JSONPretty from "react-json-pretty";
 import { verifyEVMMessageSignature } from "./helper";
 import { Result } from "./types";
 import { ZKPASS_APP_ID, ZKPASS_SCHEMA_ID } from "./constants";
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-gap: 36px;
-  grid-template-columns: 800px;
-  margin: 3rem auto;
-`;
-
-const FromContainer = styled.div`
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const FormItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: 100%;
-  margin-bottom: 1rem;
-`;
-
-const Label = styled.div`
-  text-align: right;
-  font-size: 16px;
-  font-weight: bold;
-  color: #ffffff;
-  margin-bottom: 0.5rem;
-`;
-
-const Input = styled.input`
-  display: block;
-  background-color: #ffffff;
-  border-radius: 5px;
-  height: 35px;
-  line-height: 35px;
-  width: 100%;
-  padding: 0 18px;
-  outline: none;
-  color: #000000;
-`;
-
-const Button = styled.button<{ disabled?: boolean }>`
-  position: relative;
-  display: block;
-  min-width: 120px;
-  height: 35px;
-  line-height: 35px;
-  padding: 0 18px;
-  text-align: center;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  background: #c5ff4a;
-  color: var(--color-black);
-  cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
-  &:active {
-    border: 0.5px solid #898989;
-    color: #0a0a0aab;
-  }
-`;
-
-const RightContainer = styled.div`
-  grid-column: 2 / 3;
-`;
-
-const Title = styled.h2`
-  color: #ffffff;
-  text-align: center;
-`;
+import TransgateConnect from "@zkpass/transgate-js-sdk";
 
 export default function Home() {
   const [result, setResult] = useState<any>();
@@ -114,7 +40,7 @@ https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaph
         );
         console.log("verifyResult", verifyResult);
       }
-      if (resultList.length == 1) {
+      if (resultList.length === 1) {
         setResult(resultList);
       }
     } catch (err) {
@@ -124,25 +50,29 @@ https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaph
   };
 
   return (
-    <main className={styles.main}>
-      <Title>zkPass Transgate JS-SDK Demo</Title>
-      <FormGrid>
-        <FromContainer>
-          <FormItem>
-            <RightContainer>
-              <Button onClick={() => start()}>Start KYC Process</Button>
-            </RightContainer>
-          </FormItem>
-          <FormItem>
+    <main className="bg-gray-900 min-h-screen flex items-center justify-center">
+      <div className="max-w-md mx-auto p-6 bg-gray-800 rounded-lg shadow-lg">
+        <h2 className="text-2xl text-white text-center mb-6">
+          zkPass Transgate JS-SDK Demo
+        </h2>
+        <div className="grid grid-cols-1 gap-6">
+          <div className="flex justify-center">
+            <button
+              className="px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium"
+              onClick={() => start()}>
+              Start KYC Process
+            </button>
+          </div>
+          <div>
             {result && (
               <JSONPretty
                 themeClassName="custom-json-pretty"
                 id="json-pretty"
                 data={result}></JSONPretty>
             )}
-          </FormItem>
-        </FromContainer>
-      </FormGrid>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
