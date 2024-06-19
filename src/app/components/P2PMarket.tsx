@@ -6,36 +6,64 @@ import supportedTokens from '../data/tokens.json'
 import SelectInput from './SelectInput';
 import { Menu } from '@/assets/index';
 import Image from 'next/image'
-import { CombinedInputSelect } from './index';
+import { Button, CombinedInputSelect } from './index';
 
 const options = [
     { label: 'Option 1', value: 'option1' },
     { label: 'Option 2', value: 'option2' },
     { label: 'Option 3', value: 'option3' },
-  ];
+];
+
+
+const columns = [
+    {
+        name: "Description",
+        selector: (row: any) => (
+            <div>
+                <p>{row.firstName}</p>
+                <p>{row.self}</p>
+            </div>
+        )
+    },
+    {
+        name: "Gender",
+        selector: (row: any) => row.gender
+    },
+    {
+        name: "Action",
+        selector: (row: any) => (
+            <div style={{ textAlign: 'right', width: '100%' }}>
+                <Button text="Edit" />
+            </div>
+        ),
+        style: {
+            width: "100%",
+            textAlign: "right"
+        }
+    }
+]
+
+const data = [
+    {
+        firstName: "Tester",
+        self: "Description adfkdkdf dfd dfdfd",
+        gender: "Test gender"
+    },
+    {
+        firstName: "Tester",
+        self: "Description adfkdkdf dfd dfdfd",
+        gender: "Test gender"
+    }
+]
 
 const P2PMarket = ({ styles }: { styles?: any }) => {
     const [activeTab, setActiveTab] = useState('sell');
     const [activeToken, setActiveToken] = useState('USDT');
-    const data: never[] = []
 
     const handleTabClick = (tab: React.SetStateAction<string>) => {
         setActiveTab(tab);
     };
 
-    const columns = [
-        {
-            name: 'ID',
-            selector: (row: { id: any; }) => row.id,
-            sortable: true,
-        },
-        {
-            name: 'Platform',
-            selector: (row: { platform: any; }) => row.platform,
-            sortable: true,
-            cell: (row: { icon: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; platform: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }) => <div className="flex items-center"><span className="mr-2">{row.icon}</span>{row.platform}</div>,
-        },
-    ];
     return (
         <div className='relative w-full h-auto bg-[#14161B] text-white rounded-lg p-6 px-0 flex flex-col justify-center items-start' style={styles}>
             <h1 className=' py-8'>iExchange P2P Market</h1>
@@ -76,8 +104,8 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
                     <CombinedInputSelect placeholder='Enter Amount' options={options} icon={undefined} inputValue={''} onInputChange={() => { }} onSelectChange={() => { }} />
                 </div>
                 <div className='flex flex-row justify-start items-center space-x-3'>
-                    <SelectInput options={[]} value={''} onChange={()=>{}} />
-                    <SelectInput options={[]} value={''} onChange={()=>{}} />
+                    <SelectInput options={[]} value={''} onChange={() => { }} />
+                    <SelectInput options={[]} value={''} onChange={() => { }} />
                     <button className='h-full rounded-md border border-[#C3D5F173] shadow-sm px-4 py-4 bg-transparent mt-2'>
                         <Image
                             src={Menu}

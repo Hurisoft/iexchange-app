@@ -165,7 +165,7 @@ const P2PPage = () => {
                   <h1 className="font-bold text-black">
                     1. Place an Order or Receive an Order
                   </h1>
-                  <p className="flex-grow-0">
+                  <p className="flex-grow-0 text-black">
                     Sed ut perspiciatis unde omnis iste natus error sit
                     voluptatem accusan tium dolorem quelau dantium, totam rem
                     aperiam, eaque ipsa quae a b illo{" "}
@@ -178,7 +178,7 @@ const P2PPage = () => {
                   <h1 className="font-bold text-black">
                     1. Place an Order or Receive an Order
                   </h1>
-                  <p className="flex-grow-0">
+                  <p className="flex-grow-0 text-black">
                     Sed ut perspiciatis unde omnis iste natus error sit
                     voluptatem accusan tium dolorem quelau dantium, totam rem
                     aperiam, eaque ipsa quae a b illo{" "}
@@ -191,7 +191,7 @@ const P2PPage = () => {
                   <h1 className="font-bold text-black">
                     1. Place an Order or Receive an Order
                   </h1>
-                  <p className="flex-grow-0">
+                  <p className="flex-grow-0 text-black">
                     Sed ut perspiciatis unde omnis iste natus error sit
                     voluptatem accusan tium dolorem quelau dantium, totam rem
                     aperiam, eaque ipsa quae a b illo{" "}
