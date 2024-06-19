@@ -12,8 +12,16 @@ import { Button } from "../components";
 export default function Home() {
   const [result, setResult] = useState<any>();
   const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [newSchemaId, setNewSchemaId] = useState<string>("");
+  const [newAppId, setNewAppId] = useState<string>("");
 
   const start = async (schemas = [ZKPASS_SCHEMA_ID], appid = ZKPASS_APP_ID) => {
+    if (newSchemaId) {
+      schemas = [newSchemaId];
+    }
+    if (newAppId) {
+      appid = newAppId;
+    }
     console.log("appId ", appid, " schemasID", schemas[0]);
     try {
       const connector = new TransgateConnect(appid);
@@ -58,6 +66,21 @@ export default function Home() {
         </h2>
         <div className="grid grid-cols-1 gap-6">
           <div className="flex justify-center">
+            <input
+              type="text"
+              placeholder={ZKPASS_SCHEMA_ID}
+              className="px-4 py-2 bg-gray-700 text-white rounded-md text-sm font-medium"
+              value={newSchemaId}
+              onChange={(e) => setNewSchemaId(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder={ZKPASS_APP_ID}
+              className="px-4 py-2 bg-gray-700 text-white rounded-md text-sm font-medium"
+              value={newAppId}
+              onChange={(e) => setNewAppId(e.target.value)}
+            />
+
             <button
               className="px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium"
               onClick={() => start()}>
