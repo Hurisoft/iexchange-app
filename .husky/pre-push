@@ -1,0 +1,7 @@
+#!/bin/sh
+npm run build
+if [ $? -ne 0 ]; then
+  echo -e "[33m npm run build failed and therefore the push has been prevented. 
+ Please fix the build errors and try again. [0m"
+  exit 1
+fi
