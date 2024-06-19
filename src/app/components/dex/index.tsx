@@ -79,8 +79,7 @@ const Dex = () => {
                 ? "bg-transparent text-white"
                 : "bg-transparent text-gray-500"
             }`}
-            onClick={() => handleTabClick("swap")}
-          >
+            onClick={() => handleTabClick("swap")}>
             Swap
           </div>
           <div
@@ -89,8 +88,7 @@ const Dex = () => {
                 ? "bg-transparent text-white"
                 : "bg-transparent text-gray-500"
             }`}
-            onClick={() => handleTabClick("limit")}
-          >
+            onClick={() => handleTabClick("limit")}>
             Limit
           </div>
         </div>
@@ -102,8 +100,7 @@ const Dex = () => {
               variant="ghost"
               size="icon"
               onClick={() => console.log("swap")}
-              className="rounded-full hover:shadow-inner"
-            >
+              className="rounded-full hover:shadow-inner">
               <Image src={Settings} alt="settings" width={20} height={20} />
             </ShadButton>
           </DialogTrigger>
@@ -148,29 +145,25 @@ const Dex = () => {
                   <ShadButton
                     variant="default"
                     size="sm"
-                    className="text-xs !font-normal rounded-2xl"
-                  >
+                    className="text-xs !font-normal rounded-2xl">
                     Default
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="text-xs !font-normal rounded-2xl"
-                  >
+                    className="text-xs !font-normal rounded-2xl">
                     Standard (1)
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="text-xs !font-normal rounded-2xl"
-                  >
+                    className="text-xs !font-normal rounded-2xl">
                     Fast (4)
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="text-xs !font-normal rounded-2xl"
-                  >
+                    className="text-xs !font-normal rounded-2xl">
                     Instant (5)
                   </ShadButton>
                 </div>
@@ -202,22 +195,19 @@ const Dex = () => {
                   <ShadButton
                     variant="default"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl"
-                  >
+                    className="min-w-[65px] text-xs rounded-2xl">
                     0.1%
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl"
-                  >
+                    className="min-w-[65px] text-xs rounded-2xl">
                     0.5%
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl"
-                  >
+                    className="min-w-[65px] text-xs rounded-2xl">
                     1.0%
                   </ShadButton>
                   <div className="flex items-center gap-1">
@@ -255,22 +245,19 @@ const Dex = () => {
                   <ShadButton
                     variant="default"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl"
-                  >
+                    className="min-w-[65px] text-xs rounded-2xl">
                     10m
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl"
-                  >
+                    className="min-w-[65px] text-xs rounded-2xl">
                     20m
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl"
-                  >
+                    className="min-w-[65px] text-xs rounded-2xl">
                     30m
                   </ShadButton>
                   <div className="flex items-center gap-1">
@@ -286,7 +273,7 @@ const Dex = () => {
             </div>
             <DialogFooter className="mt-5 sm:justify-start">
               <DialogClose asChild>
-                <Button className="w-full">Done</Button>
+                <Button text="Done" className="w-full" />
               </DialogClose>
             </DialogFooter>
           </DialogContent>

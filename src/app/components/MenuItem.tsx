@@ -41,11 +41,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ options, showDropdown, link }) => {
     }, [isOpen]);
 
     if (!showDropdown) {
-        return (
-            <Link href={link}>
-                {link}
-            </Link>
-        );
+        return <Link href={link as string}>{link}</Link>;
     }
 
     return (
