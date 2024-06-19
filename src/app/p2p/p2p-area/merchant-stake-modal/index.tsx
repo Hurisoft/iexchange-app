@@ -1,6 +1,7 @@
 // react
 import { FC } from "react";
 // import
+import { formatEther } from "viem";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 
@@ -42,10 +43,15 @@ const MerchantStakeModal: FC<MerchantStakeModalProps> = ({
 }) => {
   // handlers
   const {
+    setValue,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
+    defaultValues: {
+      amount: formatEther(BigInt(1500e18)),
+      currency: "GHS",
+    },
     resolver: zodResolver(formSchema),
   });
 
@@ -71,18 +77,23 @@ const MerchantStakeModal: FC<MerchantStakeModalProps> = ({
               <div className="flex flex-row">
                 <Input
                   id="amount"
+                  readOnly={true}
                   {...register("amount")}
                   type="text"
                   className="w-9/12"
                 />
-                <Select>
+                <Select
+                  defaultValue="GHS"
+                  {...register("currency")}
+                  onValueChange={(value) => {
+                    setValue("currency", value);
+                  }}
+                >
                   <SelectTrigger className="w-3/12">
                     <SelectValue placeholder="Currency" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="GHS">GHS</SelectItem>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

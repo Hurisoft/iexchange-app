@@ -5,6 +5,13 @@ import { useState } from "react";
 // next
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+// imports
+import { toast } from "sonner";
+import { useAccount, useWriteContract, useReadContracts } from "wagmi";
+
+// abi
+import { abi as usdtAbi } from "@/common/abis/CediH.json";
+import { abi as p2pAbi } from "@/common/abis/OptimisticP2P.json";
 
 // p2p area components
 import StakedSuccessModal from "./p2p-area/staked-success-modal";
@@ -21,6 +28,9 @@ import {
 import Footer from "../components/Footer";
 import NavLink from "../components/NavLink";
 
+// hooks
+import { useStoreAccount } from "@/common/hooks/api";
+
 // assets
 import { ToDo } from "@/assets/index";
 
@@ -30,6 +40,10 @@ const items = [
   { label: "Item 2", href: "/item2" },
   { label: "Item 3", href: "/item3" },
 ];
+
+// types
+import type { FormValues as MerchantStakeFormValues } from "./p2p-area/merchant-stake-modal/form-schema";
+import type { FormValues as BecomeMerchantFormValues } from "./p2p-area/become-merchant-modal/form-schema";
 
 const P2PPage = () => {
   // hooks
@@ -48,16 +62,104 @@ const P2PPage = () => {
   const [merchantStakeOpen, setMerchantStakeOpen] = useState(false);
   const [becomeMerchantOpen, setBecomeMerchantOpen] = useState(false);
 
+  // hooks
+  const { address, isConnected } = useAccount();
+  const { isPending: storingAccount, mutateAsync: storeAccount } =
+    useStoreAccount();
+
+  // wagmi hooks
+  const { data: contractData, isLoading: loadingContractData } =
+    useReadContracts({
+      contracts: [
+        {
+          abi: p2pAbi,
+          address: process.env.P2P_CONTRACT_ADDRESS as `0x${string}`,
+          functionName: "merchantStakeAmount",
+        },
+        {
+          abi: p2pAbi,
+          address: process.env.P2P_CONTRACT_ADDRESS as `0x${string}`,
+          functionName: "usdtAddress",
+        },
+      ],
+    });
+  const { writeContractAsync } = useWriteContract();
+
+  // derived contract data
+  const [merchantStakeAmount, usdtAddress] = contractData || [null, null];
+
   // handlers
   const handleOpenBecomeMerchantModal = () => {
-    // setBecomeMerchantOpen(true);
-    setMerchantKycOpen(true);
+    setBecomeMerchantOpen(true);
   };
 
-  const handleBecomeMerchantProceed = () => {
-    // TODO: do some thing with the data
-    setMerchantStakeOpen(true);
-  }
+  const handleBecomeMerchantProceed = async (
+    data: BecomeMerchantFormValues
+  ) => {
+    if (!isConnected || !address) {
+      toast.error("Please connect your wallet to proceed");
+      return;
+    }
+
+    try {
+      // store the account data on firebase
+      await storeAccount({
+        name: data.fullName,
+        number: data.phone,
+        address: address,
+      });
+
+      // open the staking modal
+      // close the become merchant modal
+      setBecomeMerchantOpen(false);
+      setMerchantStakeOpen(true);
+    } catch (error) {
+      console.log(error);
+      toast.error("An error occurred, please try again");
+    }
+  };
+
+  const handleMerchantStakeProceed = async (data: MerchantStakeFormValues) => {
+    if (!isConnected || !address) {
+      toast.error("Please connect your wallet to proceed");
+      return;
+    }
+
+    if (usdtAddress?.status === "failure") {
+      toast.error(
+        "Could not fetch the merchant stake amount, please try again"
+      );
+      return;
+    }
+
+    try {
+      // approve the p2p contract to spend the usdt token
+      await writeContractAsync({
+        abi: usdtAbi,
+        address: usdtAddress!.result as `0x${string}`,
+        functionName: "approve",
+        args: [
+          process.env.P2P_CONTRACT_ADDRESS as `0x${string}`,
+          merchantStakeAmount!.result,
+        ],
+      });
+
+      // register the merchant on the p2p contract
+      await writeContractAsync({
+        abi: p2pAbi,
+        address: process.env.P2P_CONTRACT_ADDRESS as `0x${string}`,
+        functionName: "registerMerchant",
+      });
+
+      // close the staking modal
+      setMerchantStakeOpen(false);
+      // open the staked success modal
+      setStakedSuccessOpen(true);
+    } catch (error) {
+      console.log(error);
+      toast.error("An error occurred, please try again");
+    }
+  };
 
   return (
     <>
@@ -66,7 +168,9 @@ const P2PPage = () => {
           <div className="w-full p-6 flex flex-row justify-between items-center">
             <div className="flex flex-row space-x-6">
               <div className="flex flex-row items-center text-2xl">
-                <span className="text-[#fffsetMerchantStakeOpenfff] font-light">Dex</span>
+                <span className="text-[#fffsetMerchantStakeOpenfff] font-light">
+                  Dex
+                </span>
                 <span className="text-[#1ABCFE] font-bold">Ram</span>
               </div>
               <div className="flex flex-row">
@@ -206,16 +310,18 @@ const P2PPage = () => {
       <BecomeMerchantModal
         open={becomeMerchantOpen}
         setOpen={setBecomeMerchantOpen}
+        isLoading={storingAccount}
         onProceed={handleBecomeMerchantProceed}
       />
       <MerchantStakeModal
         open={merchantStakeOpen}
         setOpen={setMerchantStakeOpen}
-        onStake={handleBecomeMerchantProceed}
+        onStake={handleMerchantStakeProceed}
       />
       <StakedSuccessModal
         open={stakedSuccessOpen}
         setOpen={setStakedSuccessOpen}
+        onProceed={() => setMerchantKycOpen(true)}
       />
       <VerifyIdentityModal
         open={merchantKycOpen}

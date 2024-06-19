@@ -57,6 +57,7 @@ const Button: FC<Props> = ({
 
   return (
     <button
+      // {...props}
       onClick={onClickHandler}
       className={`bg-gradient-to-b from-[#3384D9] via-[#0051A6] to-[#073E66] text-white text-sm px-4 py-3 rounded-lg ${className}`}
       disabled={loading || props.disabled} // Disable button when loading

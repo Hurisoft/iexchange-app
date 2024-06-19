@@ -25,12 +25,14 @@ import { formSchema, FormValues } from "./form-schema";
 type BecomeMerchantModalProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  onProceed: (data: FormValues) => void;
+  isLoading?: boolean;
+  onProceed: (data: FormValues) => Promise<void>;
 };
 
 const BecomeMerchantModal: FC<BecomeMerchantModalProps> = ({
   open,
   setOpen,
+  isLoading,
   onProceed,
 }) => {
   // handlers
@@ -44,6 +46,7 @@ const BecomeMerchantModal: FC<BecomeMerchantModalProps> = ({
 
   const onSubmit: SubmitHandler<FormValues> = (data, event) => {
     event?.preventDefault();
+    
     onProceed(data);
   };
 
@@ -68,17 +71,17 @@ const BecomeMerchantModal: FC<BecomeMerchantModalProps> = ({
               />
             </div>
             <div className="flex flex-col flex-1 justify-center gap-4">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="text">Phone</Label>
               <Input
-                id="email"
-                {...register("email")}
-                type="email"
+                id="phone"
+                {...register("phone")}
+                type="text"
                 className="w-full"
               />
             </div>
           </div>
           <DialogFooter className="flex !flex-row items-center justify-center">
-            <Button type="submit" className="!px-8">
+            <Button type="submit" loading={isLoading ?? false} className="!px-8">
               Proceed
             </Button>
           </DialogFooter>

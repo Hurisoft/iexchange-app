@@ -6,7 +6,7 @@ import Dex from './components/dex';
 import HorizontalNav from './components/HorizontalNav';
 import Image from 'next/image';
 import Faq from './components/Faq';
-import Questions from './data/questions.json';
+import Questions from '@/common/data/questions.json';
 import Footer from './components/Footer';
 import { Earn, P2PMarket } from './components/index';
 
