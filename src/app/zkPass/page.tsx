@@ -6,6 +6,7 @@ import styled from "styled-components";
 import JSONPretty from "react-json-pretty";
 import { verifyEVMMessageSignature } from "./helper";
 import { Result } from "./types";
+import { ZKPASS_APP_ID, ZKPASS_SCHEMA_ID } from "./constants";
 
 const FormGrid = styled.div`
   display: grid;
@@ -80,26 +81,10 @@ const Title = styled.h2`
 `;
 
 export default function Home() {
-  const [appid1, setAppid1] = useState<string>(
-    "39a00e9e-7e6d-461e-9b9d-d520b355d1c0"
-  );
-  const [appid2, setAppid2] = useState<string>(
-    "39a00e9e-7e6d-461e-9b9d-d520b355d1c0"
-  );
-  const [value1, setValue1] = useState<string>(
-    "c7eab8b7d7e44b05b41b613fe548edf5"
-  );
-  const [value2, setValue2] = useState<string>(
-    "c7eab8b7d7e44b05b41b613fe548edf5"
-  );
-  const [value3, setValue3] = useState<string>(
-    "762be634cfa1473eaaf374fa48504886"
-  );
-
   const [result, setResult] = useState<any>();
-  const [result2, setResult2] = useState<any>();
 
-  const start = async (schemas: string[], appid: string) => {
+  const start = async (schemas = [ZKPASS_SCHEMA_ID], appid = ZKPASS_APP_ID) => {
+    console.log("appId ", appid, " schemasID", schemas[0]);
     try {
       const connector = new TransgateConnect(appid);
 
@@ -131,8 +116,6 @@ https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaph
       }
       if (resultList.length == 1) {
         setResult(resultList);
-      } else {
-        setResult2(resultList);
       }
     } catch (err) {
       alert(JSON.stringify(err));
@@ -146,28 +129,8 @@ https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaph
       <FormGrid>
         <FromContainer>
           <FormItem>
-            <Label>Appid:</Label>
-            <Input
-              value={appid1}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setAppid1(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <Label>Schema Id:</Label>
-            <Input
-              value={value1}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setValue1(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
             <RightContainer>
-              <Button onClick={() => start([value1], appid1)}>
-                Start Single Schema
-              </Button>
+              <Button onClick={() => start()}>Start KYC Process</Button>
             </RightContainer>
           </FormItem>
           <FormItem>
@@ -176,50 +139,6 @@ https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaph
                 themeClassName="custom-json-pretty"
                 id="json-pretty"
                 data={result}></JSONPretty>
-            )}
-          </FormItem>
-        </FromContainer>
-        <FromContainer>
-          <FormItem>
-            <Label>Appid:</Label>
-            <Input
-              value={appid2}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setAppid2(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <Label>Schema Id1:</Label>
-            <Input
-              value={value2}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setValue2(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <Label>Schema Id2:</Label>
-            <Input
-              value={value3}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setValue3(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <RightContainer>
-              <Button onClick={() => start([value2, value3], appid2)}>
-                Start multi-schemas
-              </Button>
-            </RightContainer>
-          </FormItem>
-          <FormItem>
-            {result2 && (
-              <JSONPretty
-                themeClassName="custom-json-pretty"
-                id="json-pretty1"
-                data={result2}></JSONPretty>
             )}
           </FormItem>
         </FromContainer>
