@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Faq from './components/Faq';
 import Questions from './data/questions.json';
 import Footer from './components/Footer';
-import { Earn, IExchangeBanner, P2PMarket } from './components/index';
+import { Earn, P2PMarket } from './components/index';
 
 const Page: React.FC = () => {
   return (
@@ -28,13 +28,29 @@ const Page: React.FC = () => {
         <Dex />
       </div>
       <div className='w-[90%] absolute top-[720px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 justify-center bg-[#141618] border border-[#C3D5F140] pl-0 rounded-lg h-[150px]'>
-        <IExchangeBanner />
+        <div className="relative h-full pl-6">
+          <div className='h-full flex flex-col justify-center'>
+            <div className='flex flex-col items-start'>
+              <Image
+                src={Logo}
+                alt="logo"
+                width={100}
+                height={100}
+              />
+              <div className='ml-2'>
+                <h1 className='text-white text-xl'>Smart Contract, Trade Immediately with return.</h1>
+                <p className='text-white text-xs'>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              </div>
+            </div>
+          </div>
+          <Image src={GoldCoins} alt="bg" height={150} className='absolute right-0 top-0' />
+        </div>
       </div>
       <div className='w-full bg-[#14161B] h-auto mt-0 pb-20'>
         <div className="mx-20">
           <div className='pt-20'>
             <div className='w-full'>
-              <P2PMarket styles={{color:"white"}} />
+              <P2PMarket />
             </div>
             <Earn />
             <div className='mt-10'>
