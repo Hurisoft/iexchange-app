@@ -23,6 +23,14 @@ const VerifyIdentityModal: FC<VerifyIdentityModalProps> = ({
   open,
   setOpen,
 }) => {
+  // handlers
+  const handleProceed = () => {
+    // redirect to kyc page
+    window.open("https://ikyc.vercel.app", "_blank");
+    // close modal
+    setOpen(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[460px]">
@@ -36,7 +44,7 @@ const VerifyIdentityModal: FC<VerifyIdentityModalProps> = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex !flex-row items-center justify-center">
-          <Button className="!px-8">Proceed To KYC</Button>
+          <Button onClick={handleProceed} className="!px-8">Proceed To KYC</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

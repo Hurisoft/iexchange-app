@@ -4,7 +4,7 @@ import { z } from "zod";
 // schema
 export const formSchema = z.object({
   fullName: z.string(),
-  email: z.string().email(),
+  phone: z.string(),
 });  
 
 // types

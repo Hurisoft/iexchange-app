@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev:watch": "npx concurrently \"npm run codegen:get-schema:watch\"  \"npm run dev\"",
+    "codegen": "npx graphql-codegen --config codegen.ts",
+    "codegen:watch": "npx graphql-codegen --config codegen.ts --watch",
+    "get-schema": "node get-schema.js > schema.graphql",
+    "codegen:get-schema": "npm run get-schema && npm run codegen",
+    "codegen:get-schema:watch": "npm run get-schema && npm run codegen:watch"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
@@ -16,6 +22,7 @@
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@rainbow-me/rainbowkit": "^2.1.2",
     "@sumsub/websdk-react": "^2.3.0",
@@ -33,10 +40,12 @@
     "react-data-table-component": "^7.6.2",
     "react-dom": "^18",
     "react-json-pretty": "^2.2.0",
+    "sonner": "^1.5.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

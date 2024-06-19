@@ -13,7 +13,7 @@ import NavLink from './NavLink';
 import { Logo } from '@/assets/index';
 
 // data
-import routeData from '../data/routes.json';
+import routeData from '@/common/data/routes.json';
 
 const HorizontalNav = () => {
   return (

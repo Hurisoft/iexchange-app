@@ -12,15 +12,25 @@ import { Button } from "@/app/components";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
 } from "@/components/ui/dialog";
 
 // types
 type StakedSucessModalProps = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  onProceed: () => void;
 };
 
-const StakedSuccessModal: FC<StakedSucessModalProps> = ({ open, setOpen }) => {
+const StakedSuccessModal: FC<StakedSucessModalProps> = ({ open, setOpen, onProceed }) => {
+  // handlers
+  const handleProceed = () => {
+    // close modal
+    setOpen(false);
+    // open next modal (kyc modal)
+    onProceed();
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[377px]">
@@ -35,6 +45,11 @@ const StakedSuccessModal: FC<StakedSucessModalProps> = ({ open, setOpen }) => {
             <p>You have Secured a Merchant Placement</p>
           </div>
         </div>
+        <DialogFooter>
+          <Button onClick={handleProceed}>
+            Process to Verification
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

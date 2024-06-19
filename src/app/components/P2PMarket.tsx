@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import DataGrid from './DataGrid';
-import supportedTokens from '../data/tokens.json'
+import supportedTokens from '@/common/data/tokens.json'
 import SelectInput from './SelectInput';
 import { Menu } from '@/assets/index';
 import Image from 'next/image'
