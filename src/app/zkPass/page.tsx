@@ -1,139 +1,88 @@
 "use client";
 import { useState } from "react";
-import styles from "./page.module.css";
-import TransgateConnect from "@zkpass/transgate-js-sdk";
-import styled from "styled-components";
 import JSONPretty from "react-json-pretty";
 import { verifyEVMMessageSignature } from "./helper";
 import { Result } from "./types";
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-gap: 36px;
-  grid-template-columns: 800px;
-  margin: 3rem auto;
-`;
-
-const FromContainer = styled.div`
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const FormItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: 100%;
-  margin-bottom: 1rem;
-`;
-
-const Label = styled.div`
-  text-align: right;
-  font-size: 16px;
-  font-weight: bold;
-  color: #ffffff;
-  margin-bottom: 0.5rem;
-`;
-
-const Input = styled.input`
-  display: block;
-  background-color: #ffffff;
-  border-radius: 5px;
-  height: 35px;
-  line-height: 35px;
-  width: 100%;
-  padding: 0 18px;
-  outline: none;
-  color: #000000;
-`;
-
-const Button = styled.button<{ disabled?: boolean }>`
-  position: relative;
-  display: block;
-  min-width: 120px;
-  height: 35px;
-  line-height: 35px;
-  padding: 0 18px;
-  text-align: center;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  background: #c5ff4a;
-  color: var(--color-black);
-  cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
-  &:active {
-    border: 0.5px solid #898989;
-    color: #0a0a0aab;
-  }
-`;
-
-const RightContainer = styled.div`
-  grid-column: 2 / 3;
-`;
-
-const Title = styled.h2`
-  color: #ffffff;
-  text-align: center;
-`;
+import { ZKPASS_APP_ID, ZKPASS_SCHEMA_ID } from "./constants";
+import TransgateConnect from "@zkpass/transgate-js-sdk";
+import { Dialog } from "@/components/ui/dialog";
+import { DialogContent } from "@radix-ui/react-dialog";
+import { Button } from "../components";
+import { ethers } from "ethers";
+import AttestationABI from "./AttestationABI.json";
 
 export default function Home() {
-  const [appid1, setAppid1] = useState<string>(
-    "39a00e9e-7e6d-461e-9b9d-d520b355d1c0"
-  );
-  const [appid2, setAppid2] = useState<string>(
-    "39a00e9e-7e6d-461e-9b9d-d520b355d1c0"
-  );
-  const [value1, setValue1] = useState<string>(
-    "c7eab8b7d7e44b05b41b613fe548edf5"
-  );
-  const [value2, setValue2] = useState<string>(
-    "c7eab8b7d7e44b05b41b613fe548edf5"
-  );
-  const [value3, setValue3] = useState<string>(
-    "762be634cfa1473eaaf374fa48504886"
-  );
-
   const [result, setResult] = useState<any>();
-  const [result2, setResult2] = useState<any>();
-
-  const start = async (schemas: string[], appid: string) => {
+  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [newSchemaId, setNewSchemaId] = useState<string>("");
+  const [newAppId, setNewAppId] = useState<string>("");
+  const start = async (
+    schemaId: string = ZKPASS_SCHEMA_ID,
+    appid: string = ZKPASS_APP_ID
+  ) => {
+    if (newSchemaId) {
+      schemaId = newSchemaId;
+    }
+    if (newAppId) {
+      appid = newAppId;
+    }
     try {
       const connector = new TransgateConnect(appid);
-
       const isAvailable = await connector.isTransgateAvailable();
       if (!isAvailable) {
-        return alert(
-          `Please install zkPass TransGate
-https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaphappihehpma
-`
-        );
+        return alert("Please install zkPass TransGate");
       }
-
-      const resultList: any[] = [];
-      while (schemas.length > 0) {
-        const schemaId = schemas.shift() as string;
-
-        const res = (await connector.launch(schemaId)) as Result;
-        resultList.push(res);
-
-        const verifyResult = verifyEVMMessageSignature(
-          res.taskId,
-          schemaId,
-          res.uHash,
-          res.publicFieldsHash,
-          res.validatorSignature,
-          res.validatorAddress
-        );
-        console.log("verifyResult", verifyResult);
+      //@ts-ignore
+      if (window.ethereum == null) {
+        return alert("MetaMask not installed");
       }
-      if (resultList.length == 1) {
-        setResult(resultList);
-      } else {
-        setResult2(resultList);
-      }
+      //@ts-ignore
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      //get your ethereum address
+      const account = await signer.getAddress();
+
+      const res: any = await connector.launch(schemaId, account);
+      setResult(res);
+
+      //Sepolia contract address
+      //You can add from https://chainlist.org/?search=11155111&testnets=true
+      const contractAddress = "0x8c18c0436A8d6ea44C87Bf5853F8D11B55CF0302";
+
+      const taskId = ethers.hexlify(ethers.toUtf8Bytes(res.taskId)); // to hex
+      schemaId = ethers.hexlify(ethers.toUtf8Bytes(schemaId)); // to hex
+
+      const chainParams = {
+        taskId,
+        schemaId,
+        uHash: res.uHash,
+        recipient: account,
+        publicFieldsHash: res.publicFieldsHash,
+        validator: res.validatorAddress,
+        allocatorSignature: res.allocatorSignature,
+        validatorSignature: res.validatorSignature,
+      };
+      console.log("chainParams", chainParams);
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        AttestationABI,
+        provider
+      );
+      const data = contract.interface.encodeFunctionData("attest", [
+        chainParams,
+      ]);
+
+      let transaction = {
+        to: contractAddress,
+        from: account,
+        value: 0,
+        data,
+      };
+      console.log("transaction", transaction);
+      let tx = await signer?.sendTransaction(transaction);
+      console.log("transaction hash====>", tx.hash);
+      alert("Transaction sent successfully!");
     } catch (err) {
       alert(JSON.stringify(err));
       console.log("error", err);
@@ -141,89 +90,68 @@ https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaph
   };
 
   return (
-    <main className={styles.main}>
-      <Title>zkPass Transgate JS-SDK Demo</Title>
-      <FormGrid>
-        <FromContainer>
-          <FormItem>
-            <Label>Appid:</Label>
-            <Input
-              value={appid1}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setAppid1(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <Label>Schema Id:</Label>
-            <Input
-              value={value1}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setValue1(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <RightContainer>
-              <Button onClick={() => start([value1], appid1)}>
-                Start Single Schema
-              </Button>
-            </RightContainer>
-          </FormItem>
-          <FormItem>
+    <main className="bg-gray-900 min-h-screen flex items-center justify-center">
+      <div className="max-w-md mx-auto p-6 bg-gray-800 rounded-lg shadow-lg">
+        <h2 className="text-2xl text-white text-center mb-6">
+          zkPass Transgate JS-SDK Demo
+        </h2>
+        <div className="grid grid-cols-1 gap-6">
+          <div className="flex justify-center">
+            <div className="flex flex-col space-y-4">
+              <p className="text-white text-sm font-medium">Schema ID</p>
+              <input
+                type="text"
+                placeholder={ZKPASS_SCHEMA_ID}
+                className="px-4 py-2 bg-gray-700 text-white rounded-md text-sm font-medium"
+                value={newSchemaId}
+                onChange={(e) => setNewSchemaId(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col space-y-4">
+              <p className="text-white text-sm font-medium">App ID</p>
+              <input
+                type="text"
+                placeholder={ZKPASS_APP_ID}
+                className="px-4 py-2 bg-gray-700 text-white rounded-md text-sm font-medium"
+                value={newAppId}
+                onChange={(e) => setNewAppId(e.target.value)}
+              />
+            </div>
+
+            <button
+              className="px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium"
+              onClick={() => start()}>
+              Start KYC Process
+            </button>
+          </div>
+          <div className="flex justify-center">
             {result && (
               <JSONPretty
                 themeClassName="custom-json-pretty"
                 id="json-pretty"
                 data={result}></JSONPretty>
             )}
-          </FormItem>
-        </FromContainer>
-        <FromContainer>
-          <FormItem>
-            <Label>Appid:</Label>
-            <Input
-              value={appid2}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setAppid2(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <Label>Schema Id1:</Label>
-            <Input
-              value={value2}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setValue2(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <Label>Schema Id2:</Label>
-            <Input
-              value={value3}
-              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setValue3(e.target.value)
-              }
-            />
-          </FormItem>
-          <FormItem>
-            <RightContainer>
-              <Button onClick={() => start([value2, value3], appid2)}>
-                Start multi-schemas
-              </Button>
-            </RightContainer>
-          </FormItem>
-          <FormItem>
-            {result2 && (
-              <JSONPretty
-                themeClassName="custom-json-pretty"
-                id="json-pretty1"
-                data={result2}></JSONPretty>
-            )}
-          </FormItem>
-        </FromContainer>
-      </FormGrid>
+          </div>
+        </div>
+      </div>
+
+      <Dialog modal open={showPopup} onOpenChange={() => setShowPopup(false)}>
+        <DialogContent
+          className="absolute bg-secondary
+         p-40 rounded-sm">
+          <h4 className="">
+            Transgate is not installed. Please install zkPass TransGate
+          </h4>
+          <br />
+          <Button
+            href="https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaphappihehpma"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline">
+            TransGate Extension
+          </Button>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

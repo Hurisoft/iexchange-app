@@ -34,7 +34,7 @@ const ExplorePage: React.FC = () => {
               }}
             />
           </div>
-          <DataGrid data={[]} column={[]} />
+          <DataGrid data={[]} columns={[]} />
         </div>
       </div>
 

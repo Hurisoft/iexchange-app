@@ -13,6 +13,7 @@
     "get-schema": "node get-schema.js > schema.graphql",
     "codegen:get-schema": "npm run get-schema && npm run codegen",
     "codegen:get-schema:watch": "npm run get-schema && npm run codegen:watch"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
@@ -33,14 +34,17 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "crypto": "^1.0.1",
+    "ethers": "^6.13.1",
     "form-data": "^4.0.0",
     "lucide-react": "^0.395.0",
     "next": "14.2.4",
     "react": "^18",
     "react-data-table-component": "^7.6.2",
     "react-dom": "^18",
+    "react-hook-form": "^7.52.0",
     "react-json-pretty": "^2.2.0",
     "sonner": "^1.5.0",
+    "styled-components": "^6.1.11",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -51,6 +55,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
+    "husky": "^9.0.11",
     "postcss": "^8",
     "tailwindcss": "^3.4.4",
     "typescript": "^5"
