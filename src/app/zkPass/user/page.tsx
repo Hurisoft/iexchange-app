@@ -4,8 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchApplicantData, fetchIdImage } from "../kyc/sumsub";
 import { useUser } from "@/app/hooks/useUser";
 import Image from "next/image";
+import { HorizontalNav } from "@/app/components";
 
-export default function Kyc() {
+export default function UserPage() {
   const user = useUser();
 
   console.log("User: ", user);
@@ -28,7 +29,8 @@ export default function Kyc() {
   console.log("Applicant: ", applicant);
 
   return (
-    <div className="bg-gray-100 p-4">
+    <div className="relative min-h-screen bg-gradient-to-b from-[#000000] to-[#3384D9] flex flex-col">
+      <HorizontalNav />
       <h1 className="text-2xl font-bold mb-4">KYC Details</h1>
       <h1 className="text-xl font-bold mb-2">Applicant Information</h1>
       {idImages?.map((image, i) => (

@@ -7,7 +7,7 @@ import { ZKPASS_APP_ID, ZKPASS_SCHEMA_ID } from "./constants";
 import TransgateConnect from "@zkpass/transgate-js-sdk";
 import { Dialog } from "@/components/ui/dialog";
 import { DialogContent } from "@radix-ui/react-dialog";
-import { Button } from "../components";
+import { Button, HorizontalNav } from "../components";
 import { ethers } from "ethers";
 import AttestationABI from "./AttestationABI.json";
 
@@ -90,7 +90,8 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-gray-900 min-h-screen flex items-center justify-center">
+    <main className="bg-gradient-to-b from-[#000000] to-[#3384D9] min-h-screen flex items-center justify-center">
+      <HorizontalNav />
       <div className="max-w-md mx-auto p-6 bg-gray-800 rounded-lg shadow-lg">
         <h2 className="text-2xl text-white text-center mb-6">
           zkPass Transgate JS-SDK Demo

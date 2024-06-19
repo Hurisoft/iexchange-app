@@ -12,7 +12,7 @@
     "codegen:watch": "npx graphql-codegen --config codegen.ts --watch",
     "get-schema": "node get-schema.js > schema.graphql",
     "codegen:get-schema": "npm run get-schema && npm run codegen",
-    "codegen:get-schema:watch": "npm run get-schema && npm run codegen:watch"
+    "codegen:get-schema:watch": "npm run get-schema && npm run codegen:watch",
     "prepare": "husky install"
   },
   "dependencies": {
