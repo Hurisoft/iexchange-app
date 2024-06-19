@@ -32,7 +32,7 @@ export default function Kyc() {
       <h1 className="text-2xl font-bold mb-4">KYC Details</h1>
       <h1 className="text-xl font-bold mb-2">Applicant Information</h1>
       {idImages?.map((image, i) => (
-        <img
+        <Image
           key={i}
           src={"data:" + image.contentType + ";base64," + image.data}
           className="w-32 h-32 object-cover rounded"

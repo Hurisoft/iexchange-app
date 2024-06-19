@@ -5,9 +5,13 @@ import { verifyEVMMessageSignature } from "./helper";
 import { Result } from "./types";
 import { ZKPASS_APP_ID, ZKPASS_SCHEMA_ID } from "./constants";
 import TransgateConnect from "@zkpass/transgate-js-sdk";
+import { Dialog } from "@/components/ui/dialog";
+import { DialogContent } from "@radix-ui/react-dialog";
+import { Button } from "../components";
 
 export default function Home() {
   const [result, setResult] = useState<any>();
+  const [showPopup, setShowPopup] = useState<boolean>(false);
 
   const start = async (schemas = [ZKPASS_SCHEMA_ID], appid = ZKPASS_APP_ID) => {
     console.log("appId ", appid, " schemasID", schemas[0]);
@@ -16,11 +20,8 @@ export default function Home() {
 
       const isAvailable = await connector.isTransgateAvailable();
       if (!isAvailable) {
-        return alert(
-          `Please install zkPass TransGate
-https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaphappihehpma
-`
-        );
+        setShowPopup(true);
+        return;
       }
 
       const resultList: any[] = [];
@@ -63,7 +64,7 @@ https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaph
               Start KYC Process
             </button>
           </div>
-          <div>
+          <div className="flex justify-center">
             {result && (
               <JSONPretty
                 themeClassName="custom-json-pretty"
@@ -73,6 +74,24 @@ https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaph
           </div>
         </div>
       </div>
+
+      <Dialog modal open={showPopup} onOpenChange={() => setShowPopup(false)}>
+        <DialogContent
+          className="absolute bg-secondary
+         p-40 rounded-sm">
+          <h4 className="">
+            Transgate is not installed. Please install zkPass TransGate
+          </h4>
+          <br />
+          <Button
+            href="https://chromewebstore.google.com/detail/zkpass-transgate/afkoofjocpbclhnldmmaphappihehpma"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 underline">
+            TransGate Extension
+          </Button>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
