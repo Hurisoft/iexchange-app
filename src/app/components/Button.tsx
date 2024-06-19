@@ -1,40 +1,57 @@
-import { FC, useState } from 'react';
-import Image from 'next/image'
-import { EarnGold } from '@/assets/index';
+import { FC } from "react";
+import Image from "next/image";
 
-interface Props {
-    text: string;
-    className?: string;
-    handleClick?: () => void;
-    loading?: boolean;
-    styles?: any
-    icon?: string
+interface Props extends React.HTMLProps<HTMLButtonElement> {
+  text?: string;
+  className?: string;
+  handleClick?: (event?: any) => void;
+  loading?: boolean;
+  styles?: any;
+  icon?: string;
 }
 
-const Button: FC<Props> = ({ text, className, handleClick, loading, styles, icon }) => {
-    const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+const Button: FC<Props> = ({
+  children,
+  text,
+  className,
+  handleClick,
+  loading,
+  styles,
+  icon,
+  ...props
+}) => {
+  const onClickHandler = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    const clickHandler = props.onClick ?? handleClick;
+    if (clickHandler) {
+      clickHandler(event); // Call the provided handleClick function
+    }
+  };
 
-    const onClickHandler = () => {
-        if (handleClick) {
-            setIsLoading(true); // Set loading state when button is clicked
-            handleClick(); // Call the provided handleClick function
-        }
-    };
-
-    return (
-        <button
-            onClick={onClickHandler}
-            className={`bg-gradient-to-b from-[#3384D9] via-[#0051A6] to-[#073E66] text-white text-sm px-4 py-3 rounded-lg ${className}`}
-            disabled={isLoading} // Disable button when loading
-            style={styles}
-        >
-            {isLoading ? 'Loading...' : <div className='flex flex-row justify-center items-center space-x-3'>
-                <span>{text}</span>
-                {icon && <Image src={icon} alt="earn" width={20} />}
+  return (
+    <button
+      onClick={onClickHandler}
+      className={`bg-gradient-to-b from-[#3384D9] via-[#0051A6] to-[#073E66] text-white text-sm px-4 py-3 rounded-lg ${className}`}
+      disabled={loading || props.disabled} // Disable button when loading
+      style={styles}
+    >
+      {loading ? (
+        "Loading..."
+      ) : (
+        <>
+          {text ? (
+            <div className="flex flex-row justify-center items-center space-x-3">
+              <span>{text}</span>
+              {icon && <Image src={icon} alt="earn" width={20} />}
             </div>
-            }
-        </button>
-    );
+          ) : (
+            children
+          )}
+        </>
+      )}
+    </button>
+  );
 };
 
 export default Button;
