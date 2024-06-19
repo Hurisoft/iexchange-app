@@ -1,64 +1,61 @@
-import React, { Fragment } from 'react';
+import React, { FC } from 'react';
 import Spinner from './Spinner';
-import DataTable, { createTheme } from 'react-data-table-component';
+import DataTable, { createTheme, TableProps } from 'react-data-table-component';
 
-// Create custom theme
 createTheme('solarized', {
-//   background: {
-//     default: '#f2f2f2',
-//   },
+  background: {
+    default: 'transparent',
+  },
   context: {
-    background: '#f2f2f2',
-    text: '#000',
+    background: 'transparent',
+    text: '#ffffff',
   },
   divider: {
-    default: '#ddd',
+    default: '#C3D5F173',
   },
 }, 'light');
 
-// Define custom styles
 const customStyles = {
   rows: {
     style: {
       minHeight: '72px',
+      color: '#ffffff',
+      borderBottom: '1px solid #C3D5F173', 
     },
   },
   headCells: {
     style: {
-      paddingLeft: '8px',
-      paddingRight: '8px',
-      paddingTop: '20px',
-      paddingBottom: '20px',
+      padding: '20px 8px',
       fontWeight: 'bold',
       fontSize: 14,
+      background:"#00142A",
+      color: '#fff',
+      borderBottom: '1px solid #C3D5F173',
     },
   },
   cells: {
     style: {
-      paddingLeft: '8px',
-      paddingRight: '8px',
-      paddingTop: '20px',
-      paddingBottom: '20px',
+      padding: '20px 8px',
+      color: '#ffffff',
     },
   },
 };
 
-// DataGrid component
-const DataGrid = (props: any) => {
+interface DataGridProps extends TableProps<any> {}
+
+const DataGrid: FC<DataGridProps> = (props) => {
   return (
-    <Fragment>
-      <DataTable
-        pagination
-        theme="solarized"
-        customStyles={customStyles}
-        highlightOnHover
-        pointerOnHover
-        dense
-        {...props}
-        progressComponent={<Spinner />}
-        // noDataComponent={<div className="text-gray-500">No records to display</div>}
-      />
-    </Fragment>
+    <DataTable
+      pagination
+      theme="solarized"
+      customStyles={customStyles}
+      // highlightOnHover
+      pointerOnHover
+      dense
+      progressComponent={<Spinner />}
+      {...props}
+      // noDataComponent={<div className="text-gray-500">No records to display</div>}
+    />
   );
 };
 
