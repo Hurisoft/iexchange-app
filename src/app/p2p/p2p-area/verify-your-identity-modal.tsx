@@ -27,7 +27,7 @@ const VerifyIdentityModal: FC<VerifyIdentityModalProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
-          <DialogTitle>Let's Verify Your Identity</DialogTitle>
+          <DialogTitle>{"Let's Verify Your Identity"}</DialogTitle>
           <DialogDescription>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur
             quo explicabo cupiditate recusandae, pariatur voluptates. Fugit
