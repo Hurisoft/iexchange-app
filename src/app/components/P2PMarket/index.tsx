@@ -29,7 +29,7 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
   const [expandedRow, setExpandedRow] = useState<boolean>(false);
 
   // hooks
-  const { data: offers } = useOffers({
+  const { data: offers, loading } = useOffers({
     first: 10,
     skip: 0,
   });
@@ -157,7 +157,7 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
     );
   };
 
-  const renderBuyForm = (row: any) => {
+  const renderBuyForm = (row: any, cancel:()=>void) => {
     return (
       <div className="w-full rounded-lg bg-gray-200 min-h-[350px] p-6 grid grid-cols-2 gap-8">
         <div>
@@ -209,7 +209,7 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
             <SelectInput options={[]} value={""} onChange={() => { }} placeholder="Payment method" />
             <div className="flex flex-row gap-4">
               <Button text="Cancel" className="w-full" />
-              <Button text="Buy" className="w-full bg-green-700" style={{ background: "green" }} />
+              <Button text="Buy" className="w-full bg-green-700" style={{ background: "green" }} onClick={()=>router.push("/order")} />
             </div>
           </div>
         </div>
@@ -259,7 +259,7 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
             ))}
           </div>
         </div>
-        {activeTab === "sell" && <ExpandableTable columns={columns} data={offers?.map(offer => ({
+        {activeTab === "sell" && <ExpandableTable columns={columns} data={(offers ?? [])?.map(offer => ({
           id: offer.id,
           advertisement: "Test",
           rate: offer.rate + " " + offer.token.symbol,
@@ -268,9 +268,9 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
             maxOrder: formatEther(offer.maxOrder),
           },
           paymentMethod: offer.paymentMethod.method
-        }))} renderExpandedRow={renderSellForm} actions={sellActions} styles={{ background: "transparent" }} isLoading={offers && offers.length <= 0} />}
+        }))} renderExpandedRow={renderSellForm} actions={sellActions} styles={{ background: "transparent" }} isLoading={loading} />}
 
-        {activeTab === "buy" && <ExpandableTable columns={columns} data={offers?.map(offer => ({
+        {activeTab === "buy" && <ExpandableTable columns={columns} data={(offers ?? [])?.map(offer => ({
           id: offer.id,
           advertisement: "Test",
           rate: offer.rate + " " + offer.token.symbol,
@@ -279,7 +279,7 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
             maxOrder: formatEther(offer.maxOrder),
           },
           paymentMethod: offer.paymentMethod.method
-        }))} renderExpandedRow={renderBuyForm} actions={buyActions} styles={{ background: "transparent" }} isLoading={offers && offers.length <= 0} />}
+        }))} renderExpandedRow={renderBuyForm} actions={buyActions} styles={{ background: "transparent" }} isLoading={loading} />}
       </div>
       <ExpandedRowModal open={expandedRow} setOpen={setExpandedRow} />
     </>

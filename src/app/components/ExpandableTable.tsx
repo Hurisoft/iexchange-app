@@ -19,7 +19,7 @@ type Action = {
 type ExpandableTableProps = {
   columns: any[];
   data: any[];
-  renderExpandedRow: (row: any, fun:(index:number)=>void) => ReactNode;
+  renderExpandedRow: (row: any, fun:()=>void) => ReactNode;
   actions?: any[];
   styles?:any;
   isLoading:boolean
