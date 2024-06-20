@@ -35,7 +35,7 @@ const CombinedInputSelect: React.FC<CombinedInputSelectProps> = ({
     };
 
     return (
-        <div className="flex items-center bg-transparent border text-white border-[#C3D5F173] rounded-md px-3">
+        <div className="flex items-center bg-transparent border text-white border-[#C3D5F173] rounded-md px-3 pr-0">
             <input
                 type="text"
                 value={inputValue}
@@ -50,7 +50,7 @@ const CombinedInputSelect: React.FC<CombinedInputSelectProps> = ({
                 <select
                     value={selectedOption}
                     onChange={handleSelectChange}
-                    className="bg-transparent border-none outline-none text-white p-2 rounded-r-md"
+                    className="bg-white border-none outline-none text-black p-2 rounded-r-md"
                 >
                     {options.map((option, index) => (
                         <option key={index} value={option.value}>

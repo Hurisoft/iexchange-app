@@ -13,6 +13,7 @@ import X from './x.svg'
 import Plus from './plus.svg'
 import Folder from './folder.svg'
 import ToDo from './todo.svg'
+import Avatar from './avatar.svg'
 
 export {
     Logo,
@@ -29,5 +30,6 @@ export {
     X,
     Plus,
     Folder,
-    ToDo
+    ToDo,
+    Avatar
 }

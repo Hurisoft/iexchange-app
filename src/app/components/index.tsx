@@ -14,6 +14,7 @@ import Earn from './Earn'
 import IExchangeBanner from "./IExchangeBanner";
 import MenuItem from "./MenuItem";
 import CombinedInputSelect from "./InputWithSelect";
+import ExpandableTable from "./ExpandableTable";
 
 export {
     HorizontalNav,
@@ -29,5 +30,6 @@ export {
     Earn,
     IExchangeBanner,
     MenuItem,
-    CombinedInputSelect
+    CombinedInputSelect,
+    ExpandableTable
 }
