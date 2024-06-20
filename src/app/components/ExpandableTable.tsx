@@ -19,7 +19,7 @@ type Action = {
 type ExpandableTableProps = {
   columns: any[];
   data: any[];
-  renderExpandedRow: (row: any) => ReactNode;
+  renderExpandedRow: (row: any, fun:(index:number)=>void) => ReactNode;
   actions?: any[];
   styles?:any;
   isLoading:boolean
@@ -86,7 +86,7 @@ const ExpandableTable: React.FC<ExpandableTableProps> = ({ columns, data, render
                 {expandedRows.includes(index) && (
                   <tr>
                     <td colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className="py-2 px-4 border-b border-[#C3D5F124]">
-                      {renderExpandedRow(row, handleRowClick)}
+                      {renderExpandedRow(row, ()=>handleRowClick(index))}
                     </td>
                   </tr>
                 )}

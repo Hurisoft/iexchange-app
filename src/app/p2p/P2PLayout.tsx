@@ -21,9 +21,7 @@ import VerifyIdentityModal from "./p2p-area/verify-your-identity-modal";
 // components
 import {
   Button,
-  IExchangeBanner,
   MenuItem,
-  P2PMarket,
 } from "../components/index";
 import Footer from "../components/Footer";
 import NavLink from "../components/NavLink";
@@ -43,9 +41,7 @@ import type { FormValues as MerchantStakeFormValues } from "./p2p-area/merchant-
 import type { FormValues as BecomeMerchantFormValues } from "./p2p-area/become-merchant-modal/form-schema";
 import KycSuccessModal from "./p2p-area/kyc-success-modal";
 
-const P2PLayout = ({children}:{children:ReactNode}) => {
-  // hooks
-  const pathname = usePathname();
+const P2PLayout = ({ children }: { children: ReactNode }) => {
 
   // state
   const [options, setOptions] = useState([
@@ -131,17 +127,6 @@ const P2PLayout = ({children}:{children:ReactNode}) => {
     }
 
     try {
-      // approve the p2p contract to spend the usdt token
-      const approveResult = await writeContractAsync({
-        abi: usdtAbi,
-        address: usdtAddress!.result as `0x${string}`,
-        functionName: "approve",
-        args: [
-          process.env.P2P_CONTRACT_ADDRESS as `0x${string}`,
-          merchantStakeAmount!.result,
-        ],
-      });
-      
       // register the merchant on the p2p contract
       await writeContractAsync({
         abi: p2pAbi,
@@ -197,11 +182,10 @@ const P2PLayout = ({children}:{children:ReactNode}) => {
                   <span
                     onClick={() => setActiveSubMenu(option)}
                     key={i}
-                    className={`px-4 py-6 pt-0 pl-0 text-sm font-medium cursor-pointer ${
-                      activeSubMenu === option
+                    className={`px-4 py-6 pt-0 pl-0 text-sm font-medium cursor-pointer ${activeSubMenu === option
                         ? "text-white border-b border-[#FFB323]"
                         : "text-gray-700"
-                    }`}>
+                      }`}>
                     {option}
                   </span>
                 ))}
