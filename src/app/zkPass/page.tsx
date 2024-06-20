@@ -16,6 +16,7 @@ export default function Home() {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [newSchemaId, setNewSchemaId] = useState<string>("");
   const [newAppId, setNewAppId] = useState<string>("");
+
   const start = async (
     schemaId: string = ZKPASS_SCHEMA_ID,
     appid: string = ZKPASS_APP_ID
@@ -37,7 +38,9 @@ export default function Home() {
         return alert("MetaMask not installed");
       }
       //@ts-ignore
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum, {
+        chainId: 84532,
+      });
       const signer = await provider.getSigner();
       //get your ethereum address
       const account = await signer.getAddress();
@@ -47,7 +50,7 @@ export default function Home() {
 
       //Sepolia contract address
       //You can add from https://chainlist.org/?search=11155111&testnets=true
-      const contractAddress = "0x8c18c0436A8d6ea44C87Bf5853F8D11B55CF0302";
+      const contractAddress = "0x8C49Fd0b3E42DbAE0b13Fde81E3023c626E6f198";
 
       const taskId = ethers.hexlify(ethers.toUtf8Bytes(res.taskId)); // to hex
       schemaId = ethers.hexlify(ethers.toUtf8Bytes(schemaId)); // to hex

@@ -9,11 +9,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 // components
 import { Button } from "@/app/components";
 // ui components
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 
 // types
 type StakedSucessModalProps = {
@@ -22,14 +18,18 @@ type StakedSucessModalProps = {
   onProceed: () => void;
 };
 
-const StakedSuccessModal: FC<StakedSucessModalProps> = ({ open, setOpen, onProceed }) => {
+const KycSuccessModal: FC<StakedSucessModalProps> = ({
+  open,
+  setOpen,
+  onProceed,
+}) => {
   // handlers
   const handleProceed = () => {
     // close modal
     setOpen(false);
     // open next modal (kyc modal)
     onProceed();
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -46,16 +46,17 @@ const StakedSuccessModal: FC<StakedSucessModalProps> = ({ open, setOpen, onProce
           </div>
           {/* content */}
           <div className="flex flex-col gap-3 text-center">
-            <h3 className="text-xl font-medium">Successfully Staked</h3>
-            <p>You have Secured a Merchant Placement</p>
+            <h3 className="text-xl font-medium">KYC Verified Successfully</h3>
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleProceed}>Proceed to Verification</Button>
+          <Button className="mx-auto" onClick={handleProceed}>
+            Place an ad
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default StakedSuccessModal;
+export default KycSuccessModal;

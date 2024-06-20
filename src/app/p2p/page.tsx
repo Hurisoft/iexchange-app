@@ -44,6 +44,7 @@ const items = [
 // types
 import type { FormValues as MerchantStakeFormValues } from "./p2p-area/merchant-stake-modal/form-schema";
 import type { FormValues as BecomeMerchantFormValues } from "./p2p-area/become-merchant-modal/form-schema";
+import KycSuccessModal from "./p2p-area/kyc-success-modal";
 
 const P2PPage = () => {
   // hooks
@@ -61,6 +62,7 @@ const P2PPage = () => {
   const [stakedSuccessOpen, setStakedSuccessOpen] = useState(false);
   const [merchantStakeOpen, setMerchantStakeOpen] = useState(false);
   const [becomeMerchantOpen, setBecomeMerchantOpen] = useState(false);
+  const [kycSuccessOpen, setkycSuccessOpen] = useState(false);
 
   // hooks
   const { address, isConnected } = useAccount();
@@ -161,6 +163,10 @@ const P2PPage = () => {
     }
   };
 
+  const handleFinishedKyc = () => {
+    setkycSuccessOpen(true);
+  };
+
   return (
     <>
       <div className="w-full relative min-h-screen bg-gradient-to-b from-[#000000] to-[#3384D9] flex flex-col">
@@ -199,8 +205,7 @@ const P2PPage = () => {
                       activeSubMenu === option
                         ? "text-white border-b border-[#FFB323]"
                         : "text-gray-700"
-                    }`}
-                  >
+                    }`}>
                     {option}
                   </span>
                 ))}
@@ -236,8 +241,7 @@ const P2PPage = () => {
                       ? "bg-[#1D2027] text-white "
                       : "bg-[#2A2D34] text-gray-500"
                   }`}
-                  onClick={() => setActiveTab("trade")}
-                >
+                  onClick={() => setActiveTab("trade")}>
                   Trade
                 </div>
                 <div
@@ -246,8 +250,7 @@ const P2PPage = () => {
                       ? "bg-[#1D2027] text-white "
                       : "bg-[#2A2D34] text-gray-500"
                   }`}
-                  onClick={() => setActiveTab("merchant")}
-                >
+                  onClick={() => setActiveTab("merchant")}>
                   Merchant
                 </div>
                 <div
@@ -256,8 +259,7 @@ const P2PPage = () => {
                       ? "bg-[#1D2027] text-white "
                       : "bg-[#2A2D34] text-gray-500"
                   }`}
-                  onClick={() => setActiveTab("settler")}
-                >
+                  onClick={() => setActiveTab("settler")}>
                   Settler
                 </div>
               </div>
@@ -323,9 +325,18 @@ const P2PPage = () => {
         setOpen={setStakedSuccessOpen}
         onProceed={() => setMerchantKycOpen(true)}
       />
+      <KycSuccessModal
+        // open={kycSuccessOpen}
+        open={true}
+        setOpen={setkycSuccessOpen}
+        onProceed={() => {
+          window.open("p2p/create-ad", "_self");
+        }}
+      />
       <VerifyIdentityModal
         open={merchantKycOpen}
         setOpen={setMerchantKycOpen}
+        onFinished={handleFinishedKyc}
       />
     </>
   );
