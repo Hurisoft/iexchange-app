@@ -1,0 +1,7 @@
+query SupportedP2PTokens {
+  p2Ptokens {
+    id
+    name
+    symbol
+  }
+}

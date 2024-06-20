@@ -1,0 +1,26 @@
+query Offers($where: Offer_filter, $first: Int, $skip: Int) {
+  offers(where: $where, first: $first, skip: $skip) {
+    id
+    token {
+      id
+      name
+      symbol
+    }
+    currency {
+      id
+      currency
+    }
+    paymentMethod {
+      id
+      method
+    }
+    rate
+    minOrder
+    maxOrder
+    active
+    merchant {
+      id
+      isMerchant
+    }
+  }
+}

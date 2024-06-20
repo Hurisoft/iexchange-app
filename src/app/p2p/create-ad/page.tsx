@@ -2,6 +2,15 @@
 
 // react
 import { useState } from "react";
+// imports
+import { toast } from "sonner";
+import { parseEther } from "viem";
+import { useWriteContract, useAccount } from "wagmi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+// abi
+import { abi as P2PAbi } from "@/common/abis/OptimisticP2P.json";
 
 // components
 import { Button, MenuItem, NavLink, Footer } from "@/app/components";
@@ -13,12 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// hooks
+import { useSupportedP2PTokens } from "@/common/hooks/queries";
 
 // constants
 const items = [
@@ -26,6 +37,16 @@ const items = [
   { label: "Item 2", href: "/item2" },
   { label: "Item 3", href: "/item3" },
 ];
+
+// form schema
+import { formSchema, FormValues } from "./form-schema";
+
+// types
+import {
+  SupportedCurrencies,
+  SupportedMethods,
+  TradeType,
+} from "@/common/types";
 
 const CreateAdPage = () => {
   // state
@@ -35,6 +56,70 @@ const CreateAdPage = () => {
     "Appealed Orders",
   ]);
   const [activeSubMenu, setActiveSubMenu] = useState("iExchange P2P Market");
+
+  // form hooks
+  const {
+    setValue,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      currency: SupportedCurrencies.GHS,
+      paymentMethod: SupportedMethods.momo,
+      offerType: TradeType.buy,
+    },
+    resolver: zodResolver(formSchema),
+  });
+  // contract hooks
+  const { address, isConnected } = useAccount();
+  const { writeContractAsync } = useWriteContract();
+  // hooks
+  const { data: supportedP2PTokens } = useSupportedP2PTokens();
+
+  console.log({ errors });
+
+  // handlers
+  const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
+    event?.preventDefault();
+
+    if (!isConnected || !address) {
+      toast.error("Please connect your wallet to proceed.");
+      return;
+    }
+
+    const selectedToken = supportedP2PTokens?.find(
+      (token) => token.symbol === data.token
+    );
+
+    try {
+      // TODO: get account hash from abi with user address
+      const accountHash =
+        "0x90860c85645748f61a8fbf83c77a0ded3ea88a61000855a3581a326b92cd69c1";
+
+      await writeContractAsync({
+        abi: P2PAbi,
+        address: process.env.P2P_CONTRACT_ADDRESS as `0x${string}`,
+        functionName: "createOffer",
+        args: [
+          selectedToken!.id,
+          data.currency,
+          data.paymentMethod,
+          data.rate,
+          parseEther(data.minAmount.toString()),
+          parseEther(data.maxAmount.toString()),
+          accountHash,
+          address,
+          data.offerType,
+        ],
+      });
+
+      toast.success("Advert created successfully.");
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred. Please try again.");
+    }
+  };
 
   return (
     <div className="w-full relative min-h-screen bg-gradient-to-b from-[#000000] to-[#3384D9] flex flex-col">
@@ -96,7 +181,16 @@ const CreateAdPage = () => {
       {/* Form Area */}
       <div className="min-h-screen pt-40 container mx-auto space-y-10">
         <div className="py-10">
-          <Tabs defaultValue="buy">
+          <Tabs
+            defaultValue="buy"
+            onValueChange={(value) => {
+              if (value === "buy") {
+                setValue("offerType", TradeType.buy);
+              } else {
+                setValue("offerType", TradeType.sell);
+              }
+            }}
+          >
             <TabsList>
               <TabsTrigger value="buy">I Want To Buy</TabsTrigger>
               <TabsTrigger value="sell">I Want To Sell</TabsTrigger>
@@ -108,7 +202,10 @@ const CreateAdPage = () => {
               </div>
               <div className="py-8 px-10">
                 <div className="mx-auto py-8 px-10 bg-secondary rounded-lg shadow-xl">
-                  <form className="flex flex-col gap-10">
+                  <form
+                    className="flex flex-col gap-10"
+                    onSubmit={handleSubmit(onSubmit)}
+                  >
                     <div className="w-full flex flex-col gap-6">
                       <h4 className="text-[#0065D0] text-lg font-medium">
                         Type And Price
@@ -119,13 +216,20 @@ const CreateAdPage = () => {
                           <Label htmlFor="asset" className="font-medium">
                             Asset
                           </Label>
-                          <Select>
+                          <Select
+                            onValueChange={(value) => {
+                              setValue("token", value);
+                            }}
+                          >
                             <SelectTrigger id="asset">
                               <SelectValue placeholder="Assets" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="USDC">USDC</SelectItem>
-                              <SelectItem value="USDT">USDT</SelectItem>
+                              {supportedP2PTokens?.map((token) => (
+                                <SelectItem key={token.id} value={token.symbol}>
+                                  {token.symbol}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
@@ -134,13 +238,25 @@ const CreateAdPage = () => {
                           <Label htmlFor="fiat" className="font-medium">
                             Fiat
                           </Label>
-                          <Select>
-                            <SelectTrigger id="fiat">
+                          <Select
+                            onValueChange={(value) => {
+                              setValue(
+                                "currency",
+                                value as SupportedCurrencies
+                              );
+                            }}
+                          >
+                            <SelectTrigger id="fiat" defaultValue={"GHS"}>
                               <SelectValue placeholder="Fiat" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="GHS">GHS</SelectItem>
-                              <SelectItem value="USD">USD</SelectItem>
+                              {Object.values(SupportedCurrencies).map(
+                                (currency) => (
+                                  <SelectItem key={currency} value={currency}>
+                                    {currency}
+                                  </SelectItem>
+                                )
+                              )}
                             </SelectContent>
                           </Select>
                         </div>
@@ -149,7 +265,14 @@ const CreateAdPage = () => {
                           <Label htmlFor="price" className="font-medium">
                             My Price
                           </Label>
-                          <Input type="text" id="price" placeholder="Price" />
+                          <Input
+                            id="price"
+                            type="number"
+                            placeholder="Price"
+                            {...register("rate", {
+                              valueAsNumber: true,
+                            })}
+                          />
                         </div>
                       </div>
                     </div>
@@ -159,13 +282,6 @@ const CreateAdPage = () => {
                         Amount and Method
                       </h4>
                       <div className="flex flex-col gap-5">
-                        {/* Amount */}
-                        <div className="flex flex-col gap-2.5">
-                          <Label htmlFor="amount" className="font-medium">
-                            Asset Total Amount
-                          </Label>
-                          <Input type="text" id="amount" placeholder="Amount" />
-                        </div>
                         {/* Order Limit */}
                         <div className="flex flex-col gap-3">
                           <h4 className="text-lg font-medium">Order Limit</h4>
@@ -174,13 +290,27 @@ const CreateAdPage = () => {
                               <Label htmlFor="min" className="font-medium">
                                 Min
                               </Label>
-                              <Input type="text" id="min" placeholder="Min" />
+                              <Input
+                                type="number"
+                                id="min"
+                                {...register("minAmount", {
+                                  valueAsNumber: true,
+                                })}
+                                placeholder="Min"
+                              />
                             </div>
                             <div className="flex flex-col gap-2.5">
                               <Label htmlFor="max" className="font-medium">
                                 Max
                               </Label>
-                              <Input type="text" id="max" placeholder="Max" />
+                              <Input
+                                type="number"
+                                id="max"
+                                {...register("maxAmount", {
+                                  valueAsNumber: true,
+                                })}
+                                placeholder="Max"
+                              />
                             </div>
                           </div>
                         </div>
@@ -194,65 +324,26 @@ const CreateAdPage = () => {
                               <Label htmlFor="method" className="font-medium">
                                 Method
                               </Label>
-                              <Select>
+                              <Select
+                                defaultValue={SupportedMethods.momo}
+                                onValueChange={(value) => {
+                                  setValue(
+                                    "paymentMethod",
+                                    value as SupportedMethods
+                                  );
+                                }}
+                              >
                                 <SelectTrigger id="method">
                                   <SelectValue placeholder="Method" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="Mobile Money">
-                                    Mobile Money
-                                  </SelectItem>
-                                  <SelectItem value="Bank Transfer">
-                                    Bank Transfer
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className="flex flex-col gap-2.5">
-                              <Label
-                                htmlFor="accountName"
-                                className="font-medium"
-                              >
-                                Account Name
-                              </Label>
-                              <Input type="text" id="accountName" />
-                            </div>
-                            <div className="flex flex-col gap-2.5">
-                              <Label
-                                htmlFor="accountNumber"
-                                className="font-medium"
-                              >
-                                Account Number
-                              </Label>
-                              <Input type="text" id="accountNumber" />
-                            </div>
-                          </div>
-                          {/* add payment button */}
-                          <div className="flex flex-row justify-start">
-                            <Button type="button">Add Payment Method</Button>
-                          </div>
-                          {/* selected methods */}
-                          <div className="flex flex-row items-center gap-3">
-                            <Badge>MTN Mobile Money</Badge>
-                            <Badge>Telecel Cash</Badge>
-                            <Badge>Bank Transfer</Badge>
-                          </div>
-                          {/* payment time limit */}
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            <div className="flex flex-col gap-2.5">
-                              <Label
-                                htmlFor="timeLimit"
-                                className="font-medium"
-                              >
-                                Payment Time Limit
-                              </Label>
-                              <Select>
-                                <SelectTrigger id="timeLimit">
-                                  <SelectValue placeholder="Time Limit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="15">15 minutes</SelectItem>
-                                  <SelectItem value="30">30 minutes</SelectItem>
+                                  {Object.values(SupportedMethods).map(
+                                    (method) => (
+                                      <SelectItem key={method} value={method}>
+                                        {method}
+                                      </SelectItem>
+                                    )
+                                  )}
                                 </SelectContent>
                               </Select>
                             </div>
@@ -264,9 +355,16 @@ const CreateAdPage = () => {
                     {/* terms */}
                     <div className="flex flex-col gap-2.5">
                       <Label htmlFor="terms" className="font-medium">
-                        Terms
+                        Terms (Optional)
                       </Label>
-                      <Textarea id="terms" placeholder="Terms" />
+                      <Textarea
+                        id="terms"
+                        {...register("terms")}
+                        placeholder="Terms"
+                      />
+                    </div>
+                    <div className="flex flex-row justify-end">
+                      <Button text="Post Ad" type="submit" />
                     </div>
                   </form>
                 </div>
