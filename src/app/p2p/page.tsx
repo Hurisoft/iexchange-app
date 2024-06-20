@@ -326,8 +326,8 @@ const P2PPage = () => {
         onProceed={() => setMerchantKycOpen(true)}
       />
       <KycSuccessModal
-        // open={kycSuccessOpen}
-        open={true}
+        open={kycSuccessOpen}
+        // open={true}
         setOpen={setkycSuccessOpen}
         onProceed={() => {
           window.open("p2p/create-ad", "_self");
