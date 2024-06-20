@@ -59,7 +59,7 @@ const customStyles = {
 // ];
 
 interface DataGridProps {
-  expandedRows: number[];
+  expandedRows?: number[];
   setExpandedRows?: React.Dispatch<React.SetStateAction<number[]>>;
   columns: any[];
   data: any[]; 
