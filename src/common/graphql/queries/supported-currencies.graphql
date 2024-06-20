@@ -1,0 +1,7 @@
+query SupportedCurrencies($where: Currency_filter) {
+  currencies(where: $where) {
+    id
+    currency
+    isAccepted
+  }
+}
