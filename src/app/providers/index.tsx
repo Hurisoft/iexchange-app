@@ -24,7 +24,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           <UserProvider>
             <RainbowKitProvider>
               {children}
-              <Toaster richColors closeButton />
+              <Toaster richColors closeButton position="top-right" />
             </RainbowKitProvider>
           </UserProvider>
         </QueryProvider>

@@ -1,13 +1,26 @@
 "use client";
 
 // react
-import { useState } from "react";
+import { useState, useRef } from "react";
 // next
 import Image from "next/image";
 // imports
+import { toast } from "sonner";
 import { CircleHelp } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { SubmitHandler, useForm } from "react-hook-form";
+// wagmi
+import { parseEther, formatEther } from "viem";
+import { useAccount, useWriteContract } from "wagmi";
+import { readContract, waitForTransactionReceipt } from "@wagmi/core";
+
+// abis
+import { abi as routerAbi } from "@/common/abis/DEXRouter.json";
+import { abi as factoryAbi } from "@/common/abis/DEXFactory.json";
+
+// config
+import { rainbowClientConfig } from "@/common/config";
 
 // components
 import Button from "../Button";
@@ -45,28 +58,239 @@ import { Eth, Settings, SwapIcon } from "@/assets/index";
 // form schema
 import { formSchema, FormValues } from "./form-schema";
 
+// constants
+import { cediToken, rampToken, supportedTokens } from "./contants";
+
 const Dex = () => {
+  // typing ref
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // state
+  const [swapping, setSwapping] = useState(false);
   const [activeTab, setActiveTab] = useState("swap"); // State to manage active tab
+  const [calculating, setCalculating] = useState(false);
 
   // form hook
   const {
+    watch,
+    setValue,
     register,
+    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
+    defaultValues: {
+      from: {
+        token: cediToken.symbol,
+        amount: "0",
+      },
+      to: {
+        token: rampToken.symbol,
+        amount: "0",
+      },
+      settings: {
+        slippage: 5,
+        deadline: 20,
+      },
+    },
     resolver: zodResolver(formSchema),
   });
+
+  // wagmi hooks
+  const { address, isConnected } = useAccount();
+  const { writeContractAsync } = useWriteContract();
 
   // handlers
   const handleTabClick = (tab: React.SetStateAction<string>) => {
     setActiveTab(tab);
   };
 
-  const onSubmit: SubmitHandler<FormValues> = (data, event) => {
+  const onSubmit: SubmitHandler<FormValues> = async (data, event) => {
     event?.preventDefault();
 
-    console.log({ swapData: data });
+    setSwapping(true);
+
+    try {
+      const fromToken = supportedTokens.find(
+        (token) => token.symbol === getValues("from.token")
+      );
+      const toToken = supportedTokens.find(
+        (token) => token.symbol === getValues("to.token")
+      );
+
+      // check if the user has enough allowance for the from token
+      const fromAllowanceResult: bigint = (await readContract(
+        rainbowClientConfig,
+        {
+          abi: fromToken!.abi,
+          address: fromToken!.address as `0x${string}`,
+          functionName: "allowance",
+          args: [address, process.env.DEX_ROUTER_CONTRACT_ADDRESS],
+        }
+      )) as bigint;
+
+      const hasEnoughFromAllowance =
+        fromAllowanceResult &&
+        fromAllowanceResult >= parseEther(getValues("from.amount"));
+
+      if (!hasEnoughFromAllowance) {
+        // if not, approve the token
+        const tx = await writeContractAsync({
+          abi: fromToken!.abi,
+          address: fromToken!.address as `0x${string}`,
+          functionName: "approve",
+          args: [
+            process.env.DEX_ROUTER_CONTRACT_ADDRESS,
+            parseEther(getValues("from.amount")),
+          ],
+        });
+
+        // wait for the transaction to be mined
+        await waitForTransactionReceipt(rainbowClientConfig, {
+          hash: tx,
+        });
+      }
+
+      // check if the user has enough allowance for the to token
+      const toAllowanceResult: bigint = (await readContract(
+        rainbowClientConfig,
+        {
+          abi: toToken!.abi,
+          address: toToken!.address as `0x${string}`,
+          functionName: "allowance",
+          args: [address, process.env.DEX_ROUTER_CONTRACT_ADDRESS],
+        }
+      )) as bigint;
+
+      const hasEnoughToAllowance =
+        toAllowanceResult &&
+        toAllowanceResult >= parseEther(getValues("to.amount"));
+
+      // if not, approve the token
+      if (!hasEnoughToAllowance) {
+        // if not, approve the token
+        const tx = await writeContractAsync({
+          abi: toToken!.abi,
+          address: toToken!.address as `0x${string}`,
+          functionName: "approve",
+          args: [
+            process.env.DEX_ROUTER_CONTRACT_ADDRESS,
+            parseEther(getValues("to.amount")),
+          ],
+        });
+
+        // wait for the transaction to be mined
+        await waitForTransactionReceipt(rainbowClientConfig, {
+          hash: tx,
+        });
+      }
+
+      // swap tokens
+      const tx = await writeContractAsync({
+        abi: routerAbi,
+        address: process.env.DEX_ROUTER_CONTRACT_ADDRESS as `0x${string}`,
+        functionName: "swapExactTokensForTokens",
+        args: [
+          parseEther(data.from.amount),
+          parseEther(data.to.amount),
+          [
+            fromToken!.address as `0x${string}`,
+            toToken!.address as `0x${string}`,
+          ],
+          address,
+          Date.now() + 1000 * 60 * (data.settings?.deadline ?? 10), // deadline 10 minutes
+        ],
+      });
+
+      // wait for the transaction to be mined
+      await waitForTransactionReceipt(rainbowClientConfig, {
+        hash: tx,
+      });
+
+      // reset form values
+      setValue("from.amount", "0");
+      setValue("to.amount", "0");
+
+      // toast success message
+      toast.success("Swap successful");
+    } catch (error) {
+      console.log(error);
+      toast.error("An error occured swapping tokens");
+    } finally {
+      setSwapping(false);
+    }
+  };
+
+  const calculateAmountsOnFromChange = async (amount: string) => {
+    setCalculating(true);
+    try {
+      const result = await readContract(rainbowClientConfig, {
+        abi: routerAbi,
+        address: process.env.DEX_ROUTER_CONTRACT_ADDRESS as `0x${string}`,
+        functionName: "getAmountsOut",
+        args: [
+          parseEther(amount),
+          [
+            supportedTokens.find(
+              (token) => token.symbol === getValues("from.token")
+            )!.address,
+            supportedTokens.find(
+              (token) => token.symbol === getValues("to.token")
+            )!.address,
+          ],
+        ],
+      });
+
+      const [_, toRawAmount] = result as [bigint, bigint];
+      const calculatedToAmount = formatEther(toRawAmount);
+      // to 2 decimal places if it's a decimal
+      const trimmedCalculatedToAmount =
+        Number(calculatedToAmount) % 1 === 0
+          ? calculatedToAmount
+          : Number(calculatedToAmount).toFixed(2);
+      setValue("to.amount", trimmedCalculatedToAmount.toString());
+    } catch (error) {
+      console.log({ error });
+      toast.warning("An error occurred while calculating amounts");
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  const calculateAmountsOnToChange = async (amount: string) => {
+    setCalculating(true);
+    try {
+      const result = await readContract(rainbowClientConfig, {
+        abi: routerAbi,
+        address: process.env.DEX_ROUTER_CONTRACT_ADDRESS as `0x${string}`,
+        functionName: "getAmountsIn",
+        args: [
+          parseEther(amount),
+          [
+            supportedTokens.find(
+              (token) => token.symbol === getValues("from.token")
+            )!.address,
+            supportedTokens.find(
+              (token) => token.symbol === getValues("to.token")
+            )!.address,
+          ],
+        ],
+      });
+
+      const [fromRawAmount, _] = result as [bigint, bigint];
+      const calculatedFromAmount = formatEther(fromRawAmount);
+      // to 2 decimal places if it's a decimal
+      const trimmedCalculatedFromAmount =
+        Number(calculatedFromAmount) % 1 === 0
+          ? calculatedFromAmount
+          : Number(calculatedFromAmount).toFixed(2);
+      setValue("from.amount", trimmedCalculatedFromAmount.toString());
+    } catch (error) {
+      console.log({ error });
+      toast.warning("An error occurred while calculating amounts");
+    } finally {
+      setCalculating(false);
+    }
   };
 
   return (
@@ -79,7 +303,8 @@ const Dex = () => {
                 ? "bg-transparent text-white"
                 : "bg-transparent text-gray-500"
             }`}
-            onClick={() => handleTabClick("swap")}>
+            onClick={() => handleTabClick("swap")}
+          >
             Swap
           </div>
           <div
@@ -88,7 +313,8 @@ const Dex = () => {
                 ? "bg-transparent text-white"
                 : "bg-transparent text-gray-500"
             }`}
-            onClick={() => handleTabClick("limit")}>
+            onClick={() => handleTabClick("limit")}
+          >
             Limit
           </div>
         </div>
@@ -100,7 +326,8 @@ const Dex = () => {
               variant="ghost"
               size="icon"
               onClick={() => console.log("swap")}
-              className="rounded-full hover:shadow-inner">
+              className="rounded-full hover:shadow-inner"
+            >
               <Image src={Settings} alt="settings" width={20} height={20} />
             </ShadButton>
           </DialogTrigger>
@@ -145,25 +372,29 @@ const Dex = () => {
                   <ShadButton
                     variant="default"
                     size="sm"
-                    className="text-xs !font-normal rounded-2xl">
+                    className="text-xs !font-normal rounded-2xl"
+                  >
                     Default
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="text-xs !font-normal rounded-2xl">
+                    className="text-xs !font-normal rounded-2xl"
+                  >
                     Standard (1)
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="text-xs !font-normal rounded-2xl">
+                    className="text-xs !font-normal rounded-2xl"
+                  >
                     Fast (4)
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="text-xs !font-normal rounded-2xl">
+                    className="text-xs !font-normal rounded-2xl"
+                  >
                     Instant (5)
                   </ShadButton>
                 </div>
@@ -195,19 +426,22 @@ const Dex = () => {
                   <ShadButton
                     variant="default"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl">
+                    className="min-w-[65px] text-xs rounded-2xl"
+                  >
                     0.1%
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl">
+                    className="min-w-[65px] text-xs rounded-2xl"
+                  >
                     0.5%
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl">
+                    className="min-w-[65px] text-xs rounded-2xl"
+                  >
                     1.0%
                   </ShadButton>
                   <div className="flex items-center gap-1">
@@ -245,19 +479,22 @@ const Dex = () => {
                   <ShadButton
                     variant="default"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl">
+                    className="min-w-[65px] text-xs rounded-2xl"
+                  >
                     10m
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl">
+                    className="min-w-[65px] text-xs rounded-2xl"
+                  >
                     20m
                   </ShadButton>
                   <ShadButton
                     variant="secondary"
                     size="sm"
-                    className="min-w-[65px] text-xs rounded-2xl">
+                    className="min-w-[65px] text-xs rounded-2xl"
+                  >
                     30m
                   </ShadButton>
                   <div className="flex items-center gap-1">
@@ -285,35 +522,37 @@ const Dex = () => {
             <div className="w-full flex flex-col mt-2 px-3 py-3 bg-[#1D2027] rounded-lg">
               <div className="flex flex-row justify-between items-center">
                 <div className="text-gray-500">Sell</div>
-                <Select {...register("from.token")}>
+                <Select
+                  value={watch("from.token")}
+                  onValueChange={(value) => {
+                    // check if the value is also selected on to side
+                    if (value === getValues("to.token")) {
+                      const oldToken = getValues("from.token");
+                      setValue("to.token", oldToken);
+                      setValue("to.amount", "0");
+                      setValue("from.token", value);
+                      setValue("from.amount", "0");
+                    }
+                  }}
+                >
                   <SelectTrigger className="w-[90px] pr-2 rounded-xl">
                     <SelectValue placeholder="Token" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ETH">
-                      <div className="flex flex-row gap-x-1.5">
-                        <Image src={Eth} alt="icon" width={15} height={50} />
-                        <span>ETH</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="ARB">
-                      <div className="flex flex-row gap-x-1.5">
-                        <Image src={Eth} alt="icon" width={15} height={50} />
-                        <span>ARB</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="BNB">
-                      <div className="flex flex-row gap-x-1.5">
-                        <Image src={Eth} alt="icon" width={15} height={50} />
-                        <span>BNB</span>
-                      </div>
-                    </SelectItem>
+                    {supportedTokens.map((token) => (
+                      <SelectItem key={token.address} value={token.symbol}>
+                        <div className="flex flex-row gap-x-1.5">
+                          <Image src={Eth} alt="icon" width={15} height={50} />
+                          <span>{token.symbol}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="w-full py-3">
-                <input
-                  type="text"
+                <Input
+                  type="number"
                   {...register("from.amount", {
                     pattern: {
                       // should be a valid non-negative number or decimal
@@ -321,6 +560,17 @@ const Dex = () => {
                       message: "Please enter a valid amount",
                     },
                   })}
+                  onChange={(e) => {
+                    // clear previous timeout
+                    if (typingTimeoutRef.current) {
+                      clearTimeout(typingTimeoutRef.current);
+                    }
+
+                    // set a new timeout
+                    typingTimeoutRef.current = setTimeout(() => {
+                      calculateAmountsOnFromChange(e.target.value);
+                    }, 500);
+                  }}
                   defaultValue={0}
                   className="bg-transparent outline-none border-none text-white"
                 />
@@ -334,35 +584,37 @@ const Dex = () => {
             <div className="w-full flex flex-col mt-2 px-3 py-3 bg-[#1D2027] rounded-lg">
               <div className="flex flex-row justify-between items-center">
                 <div className="text-gray-500">Buy</div>
-                <Select {...register("to.token")}>
+                <Select
+                  value={watch("to.token")}
+                  onValueChange={(value) => {
+                    // check if the value is also selected on from side
+                    if (value === getValues("from.token")) {
+                      const oldToken = getValues("to.token");
+                      setValue("from.token", oldToken);
+                      setValue("from.amount", "0");
+                      setValue("to.token", value);
+                      setValue("to.amount", "0");
+                    }
+                  }}
+                >
                   <SelectTrigger className="w-[90px] pr-2 rounded-xl">
                     <SelectValue placeholder="Token" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ETH">
-                      <div className="flex flex-row gap-x-1.5">
-                        <Image src={Eth} alt="icon" width={15} height={50} />
-                        <span>ETH</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="ARB">
-                      <div className="flex flex-row gap-x-1.5">
-                        <Image src={Eth} alt="icon" width={15} height={50} />
-                        <span>ARB</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="BNB">
-                      <div className="flex flex-row gap-x-1.5">
-                        <Image src={Eth} alt="icon" width={15} height={50} />
-                        <span>BNB</span>
-                      </div>
-                    </SelectItem>
+                    {supportedTokens.map((token) => (
+                      <SelectItem key={token.address} value={token.symbol}>
+                        <div className="flex flex-row gap-x-1.5">
+                          <Image src={Eth} alt="icon" width={15} height={50} />
+                          <span>{token.symbol}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="w-full py-3">
-                <input
-                  type="text"
+                <Input
+                  type="input"
                   {...register("to.amount", {
                     pattern: {
                       // should be a valid non-negative number or decimal
@@ -370,6 +622,17 @@ const Dex = () => {
                       message: "Please enter a valid amount",
                     },
                   })}
+                  onChange={(e) => {
+                    // clear previous timeout
+                    if (typingTimeoutRef.current) {
+                      clearTimeout(typingTimeoutRef.current);
+                    }
+
+                    // set a new timeout
+                    typingTimeoutRef.current = setTimeout(() => {
+                      calculateAmountsOnToChange(e.target.value);
+                    }, 500);
+                  }}
                   defaultValue={0}
                   className="bg-transparent outline-none border-none text-white"
                 />
@@ -377,7 +640,19 @@ const Dex = () => {
             </div>
           </div>
         </div>
-        <Button text="Connect Wallet" className="w-full mt-3" />
+        {isConnected ? (
+          <Button
+            loading={swapping}
+            disabled={swapping || calculating}
+            className="w-full mt-3"
+          >
+            Swap
+          </Button>
+        ) : (
+          <div className="flex items-center justify-center mt-3">
+            <ConnectButton />
+          </div>
+        )}
       </form>
     </div>
   );

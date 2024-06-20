@@ -20,8 +20,8 @@ export const formSchema = z.object({
     }),
   }),
   settings: z.object({
-    slippage: z.string().optional(),
-    deadline: z.string().optional(),
+    slippage: z.number().optional(),
+    deadline: z.number().optional(),
   }),
 });
 
