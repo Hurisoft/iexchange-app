@@ -59,7 +59,7 @@ const customStyles = {
 // ];
 
 interface DataGridProps {
-  expandedRows?: number[];
+  expandedRows?: any[];
   setExpandedRows?: React.Dispatch<React.SetStateAction<number[]>>;
   columns: any[];
   data: any[]; 
@@ -92,7 +92,7 @@ const DataGrid: FC<DataGridProps> = ({ expandedRows = [], setExpandedRows, data,
       progressComponent={<Spinner />}
       {...props}
       expandableRows
-      expandableRowExpanded={row => expandedRows.includes(row.id)}
+      expandableRowExpanded={row => expandedRows?.includes(row.id)}
       onRowExpandToggled={handleRowExpand}
       expandableRowsComponent={ExpandableComponent}
     />

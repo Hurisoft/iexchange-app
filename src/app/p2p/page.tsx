@@ -7,7 +7,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 // imports
 import { toast } from "sonner";
-import { useAccount, useWriteContract, useReadContracts } from "wagmi";
+import { useAccount, useWriteContract, useReadContracts, useWaitForTransactionReceipt } from "wagmi";
 
 // abi
 import { abi as usdtAbi } from "@/common/abis/CediH.json";
@@ -136,7 +136,7 @@ const P2PPage = () => {
 
     try {
       // approve the p2p contract to spend the usdt token
-      await writeContractAsync({
+      const approveResult = await writeContractAsync({
         abi: usdtAbi,
         address: usdtAddress!.result as `0x${string}`,
         functionName: "approve",
@@ -145,7 +145,7 @@ const P2PPage = () => {
           merchantStakeAmount!.result,
         ],
       });
-
+      
       // register the merchant on the p2p contract
       await writeContractAsync({
         abi: p2pAbi,
