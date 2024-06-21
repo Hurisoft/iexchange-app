@@ -1,19 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import supportedTokens from "@/common/data/tokens.json";
 import SelectInput from "../SelectInput";
 import { Avatar } from "@/assets/index";
 import Image from "next/image";
 import { Button, CombinedInputSelect, ExpandableTable } from "../index";
 import { formatEther } from "viem";
+import { useForm } from "react-hook-form";
+
+// imports
+// import { formSchema, FormValues } from "./form-schema";
 
 // hooks
 import { useOffers } from "@/common/hooks/queries";
 
 // components
 import ExpandedRowModal from "./expanded-row-modal";
-import { useRouter } from "next/navigation";
 
 const options = [
   { label: "Option 1", value: "option1" },
@@ -70,11 +74,11 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
         <div>
           <p className="text-gray-400">
             <span className="text-gray-400 font-bold">Min: </span>
-            {row.available.minOrder}
+            {Number(row.available.minOrder).toFixed(2)}
           </p>
           <p className="text-gray-400">
             <span className="text-gray-400 font-bold">Max: </span>
-            {row.available.maxOrder}
+            {Number(row.available.maxOrder).toFixed(2)}
           </p>
         </div>
       ),
@@ -131,7 +135,8 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
             </div>
             <div className="p-6 bg-gray-300 rounded-lg text-xs">
               <p>
-                {Number(row.available.minOrder).toFixed(2)} - {Number(row.available.maxOrder).toFixed(2)}
+                {Number(row.available.minOrder).toFixed(2)} -{" "}
+                {Number(row.available.maxOrder).toFixed(2)}
               </p>
               <p>Available</p>
             </div>
@@ -153,22 +158,24 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
           <div className="flex flex-col gap-4">
             <CombinedInputSelect
               placeholder="Enter Amount"
-              options={options}
+              options={[{ label: row.token.symbol, value: row.token.symbol }]}
               icon={undefined}
-              inputValue={""}
+              inputValue={"1"}
               onInputChange={() => {}}
               onSelectChange={() => {}}
             />
             <CombinedInputSelect
               placeholder="Enter Amount"
-              options={options}
+              options={[
+                { label: row.currency.currency, value: row.currency.currency },
+              ]}
               icon={undefined}
-              inputValue={""}
+              inputValue={`${row.price}`}
               onInputChange={() => {}}
               onSelectChange={() => {}}
             />
             <SelectInput
-              options={[]}
+              options={[row.paymentMethod]}
               value={row.paymentMethod}
               onChange={() => {}}
               placeholder="Payment method"
@@ -322,6 +329,9 @@ const P2PMarket = ({ styles }: { styles?: any }) => {
                 maxOrder: formatEther(offer.maxOrder),
               },
               paymentMethod: offer.paymentMethod.method,
+              token: offer.token,
+              currency: offer.currency,
+              price: offer.rate,
             }))}
             renderExpandedRow={renderSellForm}
             actions={sellActions}
