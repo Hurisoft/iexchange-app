@@ -11,8 +11,9 @@ import {
   useAccount,
   useWriteContract,
   useReadContracts,
-  useWaitForTransactionReceipt,
 } from "wagmi";
+import { parseEther, formatEther } from "viem";
+import { readContract, waitForTransactionReceipt } from "@wagmi/core";
 
 // abi
 import { abi as usdtAbi } from "@/common/abis/CediH.json";
@@ -33,6 +34,9 @@ import { useStoreAccount } from "@/common/hooks/api";
 
 // assets
 import { Logo } from "@/assets/index";
+
+// config
+import { rainbowClientConfig } from "@/common/config";
 
 // constants
 const items = [
@@ -131,6 +135,44 @@ const P2PLayout = ({ children }: { children: ReactNode }) => {
     }
 
     try {
+      // check the user's usdt balance
+      // check if the user has enough allowance for the from token
+
+      console.log({usdtAddress})
+      const usdAllowanceResult: bigint = (await readContract(
+        rainbowClientConfig,
+        {
+          abi: usdtAbi,
+          address: usdtAddress!.result as `0x${string}`,
+          functionName: "allowance",
+          args: [address, process.env.P2P_CONTRACT_ADDRESS],
+        }
+      )) as bigint;
+
+      const hasEnoughFromAllowance =
+        usdAllowanceResult &&
+        usdAllowanceResult >= parseEther("1500");
+
+      if (!hasEnoughFromAllowance) {
+        // if not, approve the token
+        const tx = await writeContractAsync({
+          abi: usdtAbi,
+          address: usdtAddress!.result as `0x${string}`,
+          functionName: "approve",
+          args: [
+            process.env.P2P_CONTRACT_ADDRESS,
+            parseEther("1500"),
+          ],
+        });
+
+        // wait for the transaction to be mined
+        await waitForTransactionReceipt(rainbowClientConfig, {
+          hash: tx,
+        });
+      }
+
+      console.log(process.env.P2P_CONTRACT_ADDRESS)
+
       // register the merchant on the p2p contract
       await writeContractAsync({
         abi: p2pAbi,
