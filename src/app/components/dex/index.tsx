@@ -152,38 +152,38 @@ const Dex = () => {
       }
 
       // check if the user has enough allowance for the to token
-      // const toAllowanceResult: bigint = (await readContract(
-      //   rainbowClientConfig,
-      //   {
-      //     abi: toToken!.abi,
-      //     address: toToken!.address as `0x${string}`,
-      //     functionName: "allowance",
-      //     args: [address, process.env.DEX_ROUTER_CONTRACT_ADDRESS],
-      //   }
-      // )) as bigint;
+      const toAllowanceResult: bigint = (await readContract(
+        rainbowClientConfig,
+        {
+          abi: toToken!.abi,
+          address: toToken!.address as `0x${string}`,
+          functionName: "allowance",
+          args: [address, process.env.DEX_ROUTER_CONTRACT_ADDRESS],
+        }
+      )) as bigint;
 
-      // const hasEnoughToAllowance =
-      //   toAllowanceResult &&
-      //   toAllowanceResult >= parseEther(getValues("to.amount"));
+      const hasEnoughToAllowance =
+        toAllowanceResult &&
+        toAllowanceResult >= parseEther(getValues("to.amount"));
 
-      // // if not, approve the token
-      // if (!hasEnoughToAllowance) {
-      //   // if not, approve the token
-      //   const tx = await writeContractAsync({
-      //     abi: toToken!.abi,
-      //     address: toToken!.address as `0x${string}`,
-      //     functionName: "approve",
-      //     args: [
-      //       process.env.DEX_ROUTER_CONTRACT_ADDRESS,
-      //       parseEther(getValues("to.amount")),
-      //     ],
-      //   });
+      // if not, approve the token
+      if (!hasEnoughToAllowance) {
+        // if not, approve the token
+        const tx = await writeContractAsync({
+          abi: toToken!.abi,
+          address: toToken!.address as `0x${string}`,
+          functionName: "approve",
+          args: [
+            process.env.DEX_ROUTER_CONTRACT_ADDRESS,
+            parseEther(getValues("to.amount")),
+          ],
+        });
 
-      //   // wait for the transaction to be mined
-      //   await waitForTransactionReceipt(rainbowClientConfig, {
-      //     hash: tx,
-      //   });
-      // }
+        // wait for the transaction to be mined
+        await waitForTransactionReceipt(rainbowClientConfig, {
+          hash: tx,
+        });
+      }
 
       // swap tokens
       const tx = await writeContractAsync({
