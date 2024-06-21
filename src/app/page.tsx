@@ -27,7 +27,7 @@ const Page: React.FC = () => {
         </div>
         <Dex />
       </div>
-      <div className='w-[90%] absolute top-[720px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 justify-center bg-[#141618] border border-[#C3D5F140] pl-0 rounded-lg h-[150px]'>
+      <div className='w-[90%] absolute top-[780px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 justify-center bg-[#141618] border border-[#C3D5F140] pl-0 rounded-lg h-[150px]'>
         <div className="relative h-full pl-6">
           <div className='h-full flex flex-col justify-center'>
             <div className='flex flex-col items-start'>

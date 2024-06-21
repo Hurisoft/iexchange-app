@@ -7,7 +7,12 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 // imports
 import { toast } from "sonner";
-import { useAccount, useWriteContract, useReadContracts, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useAccount,
+  useWriteContract,
+  useReadContracts,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 
 // abi
 import { abi as usdtAbi } from "@/common/abis/CediH.json";
@@ -19,15 +24,15 @@ import MerchantStakeModal from "./p2p-area/merchant-stake-modal";
 import BecomeMerchantModal from "./p2p-area/become-merchant-modal";
 import VerifyIdentityModal from "./p2p-area/verify-your-identity-modal";
 // components
-import {
-  Button,
-  MenuItem,
-} from "../components/index";
+import { Button, MenuItem } from "../components/index";
 import Footer from "../components/Footer";
 import NavLink from "../components/NavLink";
 
 // hooks
 import { useStoreAccount } from "@/common/hooks/api";
+
+// assets
+import { Logo } from "@/assets/index";
 
 // constants
 const items = [
@@ -42,7 +47,6 @@ import type { FormValues as BecomeMerchantFormValues } from "./p2p-area/become-m
 import KycSuccessModal from "./p2p-area/kyc-success-modal";
 
 const P2PLayout = ({ children }: { children: ReactNode }) => {
-
   // state
   const [options, setOptions] = useState([
     "iExchange P2P Market",
@@ -153,13 +157,8 @@ const P2PLayout = ({ children }: { children: ReactNode }) => {
       <div className="w-full relative min-h-screen bg-gradient-to-b from-[#000000] to-[#3384D9] flex flex-col">
         <div className="w-full flex flex-col border-b border-[#C3D5F126] pb-0 bg-[#181A20F2] text-white fixed top-0 left-0 z-50">
           <div className="w-full p-6 flex flex-row justify-between items-center">
-            <div className="flex flex-row space-x-6">
-              <div className="flex flex-row items-center text-2xl">
-                <span className="text-[#fffsetMerchantStakeOpenfff] font-light">
-                  Dex
-                </span>
-                <span className="text-[#1ABCFE] font-bold">Ram</span>
-              </div>
+            <div className="flex flex-row items-center space-x-6">
+              <Image src={Logo} alt="Logo" width={150} height={150} />
               <div className="flex flex-row">
                 <NavLink href="/">Swap</NavLink>
                 <NavLink href="/explore">Explore</NavLink>
@@ -182,10 +181,12 @@ const P2PLayout = ({ children }: { children: ReactNode }) => {
                   <span
                     onClick={() => setActiveSubMenu(option)}
                     key={i}
-                    className={`px-4 py-6 pt-0 pl-0 text-sm font-medium cursor-pointer ${activeSubMenu === option
+                    className={`px-4 py-6 pt-0 pl-0 text-sm font-medium cursor-pointer ${
+                      activeSubMenu === option
                         ? "text-white border-b border-[#FFB323]"
                         : "text-gray-700"
-                      }`}>
+                    }`}
+                  >
                     {option}
                   </span>
                 ))}
@@ -206,9 +207,7 @@ const P2PLayout = ({ children }: { children: ReactNode }) => {
             </div>
           </div>
         </div>
-        <div className="min-h-screen pt-40 space-y-10 px-6">
-          {children}
-        </div>
+        <div className="min-h-screen pt-40 space-y-10 px-6">{children}</div>
         <Footer />
       </div>
       <BecomeMerchantModal

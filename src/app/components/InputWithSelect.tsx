@@ -38,10 +38,10 @@ const CombinedInputSelect: React.FC<CombinedInputSelectProps> = ({
         <div className="flex items-center bg-transparent border text-white border-[#C3D5F173] rounded-md px-3 pr-0">
             <input
                 type="text"
-                value={inputValue}
-                onChange={handleInputChange}
+                defaultValue={inputValue}
+                // onChange={handleInputChange}
                 placeholder={placeholder}
-                className="flex-1 p-2 border-none outline-none rounded-l-md bg-transparent"
+                className="flex-1 p-2 border-none outline-none rounded-l-md bg-transparent text-secondary"
             />
             {/* <div className='flex flex-row bg-transparent'> */}
                 <div className="p-2">
