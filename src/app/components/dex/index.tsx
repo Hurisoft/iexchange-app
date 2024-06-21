@@ -542,7 +542,7 @@ const Dex = () => {
                     {supportedTokens.map((token) => (
                       <SelectItem key={token.address} value={token.symbol}>
                         <div className="flex flex-row gap-x-1.5">
-                          <Image src={Eth} alt="icon" width={15} height={50} />
+                          {/* <Image src={Eth} alt="icon" width={15} height={50} /> */}
                           <span>{token.symbol}</span>
                         </div>
                       </SelectItem>
@@ -604,7 +604,7 @@ const Dex = () => {
                     {supportedTokens.map((token) => (
                       <SelectItem key={token.address} value={token.symbol}>
                         <div className="flex flex-row gap-x-1.5">
-                          <Image src={Eth} alt="icon" width={15} height={50} />
+                          {/* <Image src={Eth} alt="icon" width={15} height={50} /> */}
                           <span>{token.symbol}</span>
                         </div>
                       </SelectItem>
